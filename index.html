@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BROD RADIO 128,905 - LKHB</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Roboto+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            color-scheme: light;
+            --font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body.dark {
+            color-scheme: dark;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        body.dark .flat-card {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark .tile-card {
+            background-color: #0f172a;
+            border-color: #334155;
+        }
+
+        body.dark .strip-row {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+
+        body.dark .strip-row-active {
+            background-color: #422006 !important;
+            border-color: #ca8a04 !important;
+        }
+
+        body.dark .strip-row-finished {
+            background-color: #0f172a !important;
+            opacity: 0.45;
+        }
+
+        body.dark input, body.dark select, body.dark textarea {
+            color: #f1f5f9;
+            border-color: #475569;
+        }
+
+        body.dark #qnh-bar-text {
+            color: #ffffff !important;
+        }
+
+        body.dark .bg-slate-100 { background-color: #334155 !important; }
+        body.dark .bg-slate-50 { background-color: #1e293b !important; }
+        body.dark .text-slate-900 { color: #f1f5f9 !important; }
+        body.dark .text-slate-700 { color: #cbd5e1 !important; }
+
+        body.font-inter { --font-family: 'Inter', sans-serif; }
+        body.font-roboto { --font-family: 'Roboto Condensed', sans-serif; }
+
+        body {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-family: var(--font-family);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flat-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .tile-card {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 2px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .tile-card:hover { opacity: 0.9; }
+
+        .strip-row {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .strip-row-active {
+            background-color: #fef9c3 !important;
+            border-color: #eab308 !important;
+        }
+
+        .strip-row-finished {
+            opacity: 0.45;
+            background-color: #f8fafc !important;
+        }
+
+        .has-note {
+            background-color: #fef08a !important;
+            color: #0f172a !important;
+            border-color: #eab308 !important;
+        }
+
+        .btn-action-takeoff, .btn-action-landing {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            font-weight: 800;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+        .btn-action-takeoff:hover, .btn-action-landing:hover {
+            background-color: #0284c7;
+            color: #ffffff;
+        }
+
+        .headset-btn {
+            font-size: 18px;
+            filter: grayscale(100%);
+            opacity: 0.3;
+            transition: all 0.15s;
+        }
+        .headset-btn.active {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .bell-btn {
+            font-size: 16px;
+            filter: grayscale(100%);
+            opacity: 0.3;
+            transition: all 0.15s;
+        }
+        .bell-btn.active {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .auto-textarea {
+            resize: none;
+            overflow: hidden;
+            min-height: 26px;
+        }
+
+        .param-value {
+            color: #0f172a;
+            font-weight: 900;
+        }
+        body.dark .param-value { color: #f1f5f9; }
+
+        input, select, textarea { outline: none; background: transparent; }
+
+        @keyframes alert-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .alert-banner { animation: alert-bounce 1s infinite; }
+    </style>
+</head>
+<body class="p-3 md:p-4 text-xs">
+
+    <!-- HORNI VYSKAKOVACI BANNER UPOZORNENI -->
+    <div id="alert-container" class="fixed top-2 left-1/2 -translate-x-1/2 z-50 space-y-2 w-11/12 max-w-xl pointer-events-none"></div>
+
+    <!-- ==================== 1. PŘIHLAŠOVACÍ OBRAZOVKA ==================== -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-md w-full p-6 space-y-5 shadow-2xl bg-white">
+            <div class="text-center space-y-1">
+                <h1 class="text-xl font-black text-blue-600">LETIŠTĚ HAVLÍČKŮV BROD</h1>
+                <p class="text-xs font-extrabold text-slate-400">BROD RADIO 128,905</p>
+            </div>
+
+            <!-- FORMULÁŘ PŘIHLÁŠENÍ -->
+            <form id="form-login" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">E-mail dispečera</label>
+                    <input type="email" id="login-email" required placeholder="jan.novak@seznam.cz" class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded font-bold text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Heslo</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded font-bold text-sm">
+                </div>
+                
+                <div id="login-error" class="text-red-600 font-bold text-xs hidden text-center p-2 bg-red-50 rounded border border-red-200"></div>
+
+                <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-2.5 rounded text-sm transition-all shadow-md">
+                    PŘIHLÁSIT SE DO SLUŽBY
+                </button>
+
+                <div class="text-center pt-2">
+                    <button type="button" onclick="switchLoginView('register')" class="text-xs font-bold text-blue-600 hover:underline">
+                        První přihlášení / Nastavení nového hesla
+                    </button>
+                </div>
+            </form>
+
+            <!-- FORMULÁŘ PRVNÍ REGISTRACE -->
+            <form id="form-register" onsubmit="handleRegisterCheck(event)" class="space-y-4 hidden">
+                <div class="text-xs font-bold text-slate-500 bg-slate-100 p-2.5 rounded">
+                    Zadejte svůj e-mail pro ověření v seznamu schválených dispečerů LKHB.
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">E-mail dispečera</label>
+                    <input type="email" id="reg-email" required placeholder="vojta.vejsada@gmail.com" class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded font-bold text-sm">
+                </div>
+
+                <div id="reg-password-fields" class="space-y-3 hidden border-t pt-3 border-slate-200">
+                    <div class="text-xs font-black text-emerald-600" id="reg-welcome-msg"></div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nové tajné heslo</label>
+                        <input type="password" id="reg-pass1" placeholder="••••••••" class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Potvrzení hesla</label>
+                        <input type="password" id="reg-pass2" placeholder="••••••••" class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded font-bold text-sm">
+                    </div>
+                </div>
+
+                <div id="reg-error" class="text-red-600 font-bold text-xs hidden text-center p-2 bg-red-50 rounded border border-red-200"></div>
+
+                <button type="submit" id="reg-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 rounded text-sm transition-all shadow-md">
+                    OVĚŘIT E-MAIL
+                </button>
+
+                <div class="text-center pt-1">
+                    <button type="button" onclick="switchLoginView('login')" class="text-xs font-bold text-slate-400 hover:underline">
+                        Zpět na přihlášení
+                    </button>
+                </div>
+            </form>
+
+            <div class="border-t pt-3 text-center text-[10px] text-slate-400 font-bold space-y-0.5 border-slate-200">
+                <div>Správce systému: Vojtěch Vejsada</div>
+                <div>© 2026 Vojtěch Vejsada</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 2. HLAVNÍ APLIKACE DISPEČERA ==================== -->
+    <div id="app-screen" class="hidden flex-1 flex flex-col">
+        
+        <!-- HLAVNÍ OBSAH -->
+        <div class="flex-1">
+            
+            <!-- HORNÍ PANEL -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-3">
+                
+                <!-- 1. HODINY + DATUM -->
+                <div class="md:col-span-3 flat-card p-2.5 flex flex-col justify-between">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-1">
+                        <span class="text-2xl font-black text-blue-500">UTC</span>
+                        <span class="text-3xl font-black font-mono tracking-tight" id="utc-clock">00:00</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-[10px] font-bold text-slate-400">LOCAL</span>
+                        <span class="text-sm font-bold text-slate-400 font-mono" id="local-clock">00:00</span>
+                    </div>
+                    <div class="text-[10px] font-extrabold text-slate-500 text-center border-t border-slate-200 pt-1 mt-1 uppercase" id="date-display">
+                        --.--.----
+                    </div>
+                </div>
+
+                <!-- 2. KARTY PARAMETRŮ + POZNÁMKA + PRUH OBLASTNÍ QNH -->
+                <div class="md:col-span-4 flat-card p-2 flex flex-col justify-between gap-1.5">
+                    <div class="grid grid-cols-3 gap-1.5">
+                        
+                        <!-- RWY DLAŽDICE -->
+                        <div class="tile-card" onclick="openRwyModal()">
+                            <span class="text-xs font-black text-slate-400 uppercase tracking-wider mb-0.5">RWY</span>
+                            <span id="rwy-val" class="text-xl param-value font-black">- -</span>
+                        </div>
+
+                        <!-- OKRUHY -->
+                        <div class="tile-card cursor-default">
+                            <span class="text-xs font-black text-slate-400 uppercase tracking-wider mb-0.5">OKRUHY</span>
+                            <span id="okruhy-val" class="text-sm param-value text-center font-black">- -</span>
+                        </div>
+
+                        <!-- QNH DLAŽDICE -->
+                        <div class="tile-card" onclick="openQnhModal()">
+                            <span class="text-xs font-black text-slate-400 uppercase tracking-wider mb-0.5">QNH</span>
+                            <span id="qnh-val" class="text-xl param-value font-black">- -</span>
+                        </div>
+
+                    </div>
+
+                    <!-- POZNÁMKA PROVOZNÍ -->
+                    <div class="space-y-0.5">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">POZNÁMKA</span>
+                        <textarea id="top-note" oninput="autoResizeTextarea(this); checkNoteState(this);" placeholder="Provozní upozornění..." class="auto-textarea w-full px-2 py-1 text-xs font-bold rounded border border-slate-300 transition-all" rows="1"></textarea>
+                    </div>
+
+                    <!-- TEXTOVÝ PRUH OBLASTNÍ QNH -->
+                    <div class="flex items-center gap-2 bg-slate-100 border border-slate-300 rounded px-2.5 py-1 transition-colors">
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">OBLASTNÍ QNH:</span>
+                        <div id="qnh-bar-text" class="flex-1 font-mono text-xs font-extrabold text-slate-800">
+                            Načítám...
+                        </div>
+                        <button onclick="fetchRegQnhFromSheets()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-2.5 py-1 rounded whitespace-nowrap shadow-sm">
+                            Aktualizovat
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. FREKVENCE -->
+                <div class="md:col-span-3 flat-card p-2.5 flex flex-col justify-center items-center text-center">
+                    <div class="text-lg font-black text-emerald-500 tracking-wide">
+                        BROD RADIO 128,905
+                    </div>
+                    <div class="text-sm font-black text-slate-700 mt-0.5">
+                        FIC PRAHA INFORMATION EAST 136,175
+                    </div>
+                    <div class="text-xs font-extrabold text-slate-500 mt-1 leading-relaxed">
+                        ČÁSLAV TOWER 134,205 &nbsp;|&nbsp; ČÁSLAV RADAR 130,280<br>
+                        JIHLAVA RADIO 123,490 &nbsp;|&nbsp; CHOTĚBOŘ RADIO 120,110 &nbsp;|&nbsp; PŘIBYSLAV RADIO 125,610
+                    </div>
+                    <a href="https://aim.rlp.cz/vfrmanual/" target="_blank" class="text-xs font-bold text-blue-500 hover:underline mt-1.5">
+                        VFR příručka ŘLP
+                    </a>
+                </div>
+
+                <!-- 4. STATISTIKY & AKCE -->
+                <div class="md:col-span-2 flat-card p-2.5 flex flex-col justify-between">
+                    <div class="space-y-0.5 text-xs font-bold">
+                        <div class="flex justify-between"><span>POHYBY:</span><span id="cnt-pohyby" class="text-blue-500 font-black">0</span></div>
+                        <div class="flex justify-between"><span>NA FREKVENCI:</span><span id="cnt-radio" class="text-amber-500 font-black">0</span></div>
+                        <div class="flex justify-between"><span>PŘISTÁNÍ CELKEM:</span><span id="cnt-landings" class="font-black">0</span></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 mt-1.5">
+                        <button onclick="openExportModal()" class="btn-ui bg-slate-100 font-extrabold text-[10px] py-1 rounded text-center">
+                            EXPORT
+                        </button>
+                        <button onclick="openSettingsModal()" class="btn-ui bg-slate-100 font-extrabold text-[10px] py-1 rounded" title="Nastavení">
+                            NASTAVENÍ
+                        </button>
+                        <button onclick="confirmClearLog()" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 font-extrabold text-[10px] py-1 rounded col-span-2">
+                            VYČISTIT DENÍK
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SEZNAM STRIPŮ -->
+            <div id="strips-container" class="space-y-1.5 mb-16"></div>
+
+        </div>
+
+        <!-- SPODNÍ LIŠTA -->
+        <div class="sticky bottom-0 left-0 right-0 z-40 flex flex-col md:flex-row items-center justify-between gap-2 flat-card p-2.5 shadow-lg border-t border-slate-300 backdrop-blur-md">
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <button onclick="addNewFlight()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-3.5 py-1.5 rounded shadow-sm text-xs transition-all" title="Klávesová zkratka Alt+N">
+                    + NOVÝ LET (Alt+N)
+                </button>
+
+                <!-- SPODNÍ POZNÁMKA DNE -->
+                <input type="text" id="daily-note" oninput="checkNoteState(this)" placeholder="Poznámka k provozu / dni..." class="px-2.5 py-1 text-xs w-52 rounded border border-slate-300 transition-all font-bold">
+
+                <button id="toggle-finished-btn" onclick="toggleShowFinished()" class="btn-ui bg-slate-100 font-extrabold px-3 py-1.5 rounded text-xs">
+                    ZOBRAZIT UKONČENÉ LETY
+                </button>
+
+                <!-- VĚTRONĚ NA PŘELETU MENU -->
+                <div class="relative inline-block text-left">
+                    <button onclick="toggleGliderDropdown()" class="bg-teal-600 hover:bg-teal-700 text-white font-black px-3.5 py-1.5 rounded text-xs transition-all shadow-md flex items-center gap-1.5">
+                        VĚTRONĚ NA PŘELETU <span class="text-[10px]">▼</span>
+                    </button>
+                    <div id="glider-dropdown" class="hidden absolute bottom-full left-0 mb-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-50 overflow-hidden">
+                        <button onclick="openGliderModal('insert')" class="w-full text-left px-4 py-2 text-xs font-extrabold text-slate-700 dark:text-slate-200 hover:bg-teal-50 hover:text-teal-600 transition-colors">Vložit let</button>
+                        <button onclick="openGliderModal('returns')" class="w-full text-left px-4 py-2 text-xs font-extrabold text-slate-700 dark:text-slate-200 hover:bg-teal-50 hover:text-teal-600 transition-colors">Návraty</button>
+                    </div>
+                </div>
+
+                <!-- POMOCNÁ TLAČÍTKA -->
+                <button onclick="openChecklistModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all">
+                    CHECKLIST
+                </button>
+                <button onclick="openNavestniModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all">
+                    NÁVĚSTNÍ PLOCHA
+                </button>
+                <button onclick="openContactsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all">
+                    KONTAKTY
+                </button>
+                <button onclick="openRequestModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow-md">
+                    NAHLÁSIT
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <!-- VYHLEDÁVÁNÍ -->
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-slate-400 text-xs">VYHLEDAT:</span>
+                    <input type="text" id="search-input" oninput="renderStrips()" placeholder="Volací znak, PIC, čas..." class="px-2.5 py-1 text-xs w-44 rounded border border-slate-300">
+                </div>
+
+                <!-- TLAČÍTKO ODHLÁSIT (ZKRÁCENO A ZCELA VPRAVO) -->
+                <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow">
+                    ODHLÁSIT
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PLOVOUCÍ OKNO PRO VĚTRONĚ (NÁVRATY) -->
+    <div id="glider-floating-window" class="hidden fixed bottom-16 right-4 w-96 max-w-[95vw] bg-white dark:bg-slate-800 border-2 border-teal-500 rounded-xl shadow-2xl z-50 flex flex-col resize overflow-hidden min-h-[300px] max-h-[80vh]">
+        <div id="glider-drag-handle" class="bg-teal-600 text-white px-3 py-2.5 flex justify-between items-center cursor-move select-none">
+            <span class="font-black text-xs" id="glider-window-title">VĚTRONĚ - NÁVRATY</span>
+            <div class="flex items-center gap-2">
+                <button onclick="switchGliderTab('returns')" class="text-[10px] bg-teal-700 hover:bg-teal-800 px-2 py-0.5 rounded font-bold">Aktivní</button>
+                <button onclick="switchGliderTab('history')" class="text-[10px] bg-teal-700 hover:bg-teal-800 px-2 py-0.5 rounded font-bold">Historie</button>
+                <button onclick="closeGliderWindow()" class="text-white hover:text-slate-200 font-black text-sm ml-2">&times;</button>
+            </div>
+        </div>
+        <div class="p-3 flex-1 overflow-y-auto space-y-2 text-xs" id="glider-window-content"></div>
+    </div>
+
+    <!-- MODÁLNÍ OKNO PRO VLOŽENÍ VĚTRONĚ -->
+    <div id="glider-insert-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-md w-full p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-base text-teal-600">Vložit větroň na provoz (přelet)</h3>
+                <button onclick="closeModal('glider-insert-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Volací znak </label>
+                    <input type="text" id="g-callsign" placeholder="OK-1234" oninput="onGliderCallsignInput()" onkeydown="handleGliderKeyDown(event, 'callsign')" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-black uppercase text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Typ letadla</label>
+                    <input type="text" id="g-type" placeholder="Např. L13" onkeydown="handleGliderKeyDown(event, 'type')" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-bold uppercase text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Starotvní znak</label>
+                    <input type="text" id="g-start" placeholder="např. L9" onkeydown="handleGliderKeyDown(event, 'start')" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-bold text-sm">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Poznámka</label>
+                    <input type="text" id="g-remark" placeholder="Trať/pilot" onkeydown="handleGliderKeyDown(event, 'remark')" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-bold text-sm">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                <button onclick="closeModal('glider-insert-modal')" class="bg-slate-200 dark:bg-slate-700 font-bold px-4 py-2 rounded text-xs">Zavřít</button>
+                <button onclick="saveNewGliderFlight()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-2 rounded text-xs shadow">Vložit do provozu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG RWY VYBER -->
+    <div id="rwy-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-xs w-full p-4 space-y-3">
+            <h3 class="font-extrabold text-sm text-center">Výběr dráhy v používání (RWY)</h3>
+            <div class="grid grid-cols-3 gap-2 py-2">
+                <button onclick="selectRwy('')" class="p-3 bg-slate-100 font-black rounded text-sm">- -</button>
+                <button onclick="selectRwy('11')" class="p-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded text-base">11</button>
+                <button onclick="selectRwy('29')" class="p-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded text-base">29</button>
+            </div>
+            <button onclick="closeModal('rwy-modal')" class="w-full bg-slate-200 dark:bg-slate-700 font-bold py-1.5 rounded text-xs">Zrušit</button>
+        </div>
+    </div>
+
+    <!-- DIALOG QNH VYBER -->
+    <div id="qnh-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-sm w-full p-4 space-y-3">
+            <h3 class="font-extrabold text-sm text-center">Výběr letištního QNH (hPa)</h3>
+            <div class="grid grid-cols-4 gap-1.5 max-h-60 overflow-y-auto p-1" id="qnh-grid"></div>
+            <button onclick="closeModal('qnh-modal')" class="w-full bg-slate-200 dark:bg-slate-700 font-bold py-1.5 rounded text-xs">Zrušit</button>
+        </div>
+    </div>
+
+    <!-- DIALOG CHECKLIST -->
+    <div id="checklist-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-2xl w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-base">PROVOZNÍ CHECKLIST DISPEČERA</h3>
+                <button onclick="closeModal('checklist-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+
+            <div class="flex gap-1 border-b border-slate-200 dark:border-slate-700 pb-2">
+                <button onclick="switchChecklistTab('before')" id="chk-tab-before" class="flex-1 py-2 font-black rounded text-xs bg-blue-600 text-white">PŘED SLUŽBOU</button>
+                <button onclick="switchChecklistTab('during')" id="chk-tab-during" class="flex-1 py-2 font-black rounded text-xs bg-slate-100">BĚHEM SLUŽBY</button>
+                <button onclick="switchChecklistTab('after')" id="chk-tab-after" class="flex-1 py-2 font-black rounded text-xs bg-slate-100">PO SLUŽBĚ</button>
+            </div>
+
+            <div id="chk-content-before" class="space-y-2 text-xs font-bold"></div>
+            <div id="chk-content-during" class="space-y-2 text-xs font-bold hidden"></div>
+            <div id="chk-content-after" class="space-y-2 text-xs font-bold hidden"></div>
+
+            <div class="border-t pt-3 text-right border-slate-200 dark:border-slate-700">
+                <button onclick="closeModal('checklist-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded text-xs">Zavřít</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG NÁVĚSTNÍ PLOCHA -->
+    <div id="navestni-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-3xl w-full p-4 space-y-3">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-sm" id="navestni-title">NÁVĚSTNÍ PLOCHA</h3>
+                <button onclick="closeModal('navestni-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+
+            <div class="flex flex-wrap gap-2 items-center justify-center bg-slate-100 p-2 rounded border border-slate-200 dark:border-slate-700">
+                <span class="text-xs font-extrabold text-slate-400 uppercase mr-1">Vybrat schéma:</span>
+                <button onclick="loadNavestniImgForRwy('default')" id="btn-nav-default" class="bg-blue-600 text-white font-bold px-3 py-1 rounded text-xs">Výchozí</button>
+                <button onclick="loadNavestniImgForRwy('11')" id="btn-nav-11" class="bg-slate-200 dark:bg-slate-700 font-bold px-3 py-1 rounded text-xs">RWY 11</button>
+                <button onclick="loadNavestniImgForRwy('29')" id="btn-nav-29" class="bg-slate-200 dark:bg-slate-700 font-bold px-3 py-1 rounded text-xs">RWY 29</button>
+                <button onclick="loadNavestniImgForRwy('CLSD')" id="btn-nav-clsd" class="bg-slate-200 dark:bg-slate-700 font-bold px-3 py-1 rounded text-xs">Mimo provoz (CLSD)</button>
+            </div>
+
+            <div class="flex justify-center items-center min-h-[300px] bg-slate-100 rounded border border-slate-200 dark:border-slate-700 p-2">
+                <img id="navestni-img" src="" alt="Schéma návěstní plochy" class="max-h-[65vh] object-contain rounded hidden">
+                <span id="navestni-status" class="font-bold text-slate-400 animate-pulse">Načítám...</span>
+            </div>
+
+            <div class="text-right border-t pt-2 border-slate-200 dark:border-slate-700">
+                <button onclick="closeModal('navestni-modal')" class="bg-blue-600 text-white font-bold px-4 py-1.5 rounded text-xs">Zavřít</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG KONTAKTY -->
+    <div id="contacts-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-lg w-full p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-base">DŮLEŽITÉ KONTAKTY LKHB</h3>
+                <button onclick="closeModal('contacts-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+
+            <div id="contacts-list" class="space-y-1.5"></div>
+
+            <div id="admin-add-contact-box" class="hidden border-t pt-3 space-y-2 border-slate-200 dark:border-slate-700">
+                <span class="font-black text-xs text-blue-500 block">Přidat nový kontakt (Admin)</span>
+                <input type="text" id="new-contact-name" placeholder="Název stanice / osoby" class="w-full p-2 bg-slate-100 border border-slate-300 rounded text-xs font-bold">
+                <input type="text" id="new-contact-phone" placeholder="Telefonní číslo" class="w-full p-2 bg-slate-100 border border-slate-300 rounded text-xs font-bold">
+                <button onclick="submitNewContact()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded text-xs">Uložit kontakt</button>
+            </div>
+
+            <div class="text-right border-t pt-2 border-slate-200 dark:border-slate-700">
+                <button onclick="closeModal('contacts-modal')" class="bg-blue-600 text-white font-bold px-4 py-1.5 rounded text-xs">Zavřít</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG NAHLÁSIT CHYBU / ŽÁDOSTI -->
+    <div id="request-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-md w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-base text-amber-500">Nahlásit chybu / Požadavek</h3>
+                <button onclick="closeModal('request-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-400">Popis závady nebo vašeho požadavku:</label>
+                <textarea id="req-text-input" rows="3" placeholder="Napište podrobnosti pro správce..." class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded text-xs font-bold"></textarea>
+                <button onclick="submitUserRequest()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-2 rounded text-xs shadow">Odeslat požadavek</button>
+            </div>
+
+            <div id="admin-requests-box" class="hidden border-t pt-3 space-y-2 border-slate-200 dark:border-slate-700">
+                <span class="font-black text-xs text-blue-500 block">Přehled žádostí (Správa Admin)</span>
+                <div id="admin-requests-list" class="space-y-2 text-xs"></div>
+            </div>
+
+            <div class="text-right border-t pt-2 border-slate-200 dark:border-slate-700">
+                <button onclick="closeModal('request-modal')" class="bg-slate-200 dark:bg-slate-700 font-bold px-4 py-1.5 rounded text-xs">Zavřít</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG ZVONEČEK -->
+    <div id="bell-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-sm w-full p-4 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-sm" id="bell-modal-title">Hlídání a zprávy pro let</h3>
+                <button onclick="closeModal('bell-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Typ upozornění</label>
+                    <select id="bell-type-select" onchange="onBellTypeChange()" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-bold text-xs">
+                        <option value="return">HLÍDÁNÍ NÁVRATU (na čas)</option>
+                        <option value="landing">ZPRÁVA PO PŘISTÁNÍ (po zmáčknutí přistání)</option>
+                        <option value="time">ZPRÁVA NA URČITÝ ČAS</option>
+                    </select>
+                </div>
+
+                <div id="bell-time-box">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Čas upozornění (UTC)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="bell-time-input" placeholder="16:30 nebo 1630" onkeydown="handleBellKeyDown(event)" class="flex-1 p-2 bg-slate-100 border border-slate-300 rounded font-mono font-bold text-center text-sm">
+                    </div>
+                    <div class="flex gap-1 mt-1.5">
+                        <button type="button" onclick="addMinutesToBell(15)" class="flex-1 bg-slate-200 dark:bg-slate-700 font-bold py-1 rounded text-[10px]">+15m</button>
+                        <button type="button" onclick="addMinutesToBell(30)" class="flex-1 bg-slate-200 dark:bg-slate-700 font-bold py-1 rounded text-[10px]">+30m</button>
+                        <button type="button" onclick="addMinutesToBell(45)" class="flex-1 bg-slate-200 dark:bg-slate-700 font-bold py-1 rounded text-[10px]">+45m</button>
+                        <button type="button" onclick="addMinutesToBell(60)" class="flex-1 bg-slate-200 dark:bg-slate-700 font-bold py-1 rounded text-[10px]">+60m</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Text zprávy / poznámky</label>
+                    <input type="text" id="bell-msg-input" placeholder="např. Zaplatit palivo / Zavolat..." onkeydown="handleBellKeyDown(event)" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-bold text-xs">
+                </div>
+            </div>
+
+            <div class="flex justify-between border-t pt-3 border-slate-200 dark:border-slate-700">
+                <button onclick="removeBellAlarm()" class="bg-red-500/20 text-red-500 font-bold px-3 py-1.5 rounded text-xs">Smazat hlídání</button>
+                <div class="flex gap-2">
+                    <button onclick="closeModal('bell-modal')" class="bg-slate-200 dark:bg-slate-700 font-bold px-3 py-1.5 rounded text-xs">Zrušit</button>
+                    <button onclick="saveBellAlarm()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded text-xs">Uložit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG PRO ÚPRAVU ČASU -->
+    <div id="time-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-xs w-full p-4 space-y-3">
+            <h3 class="font-extrabold text-sm" id="time-modal-title">Úprava času</h3>
+            <input type="text" id="time-input" placeholder="HH:MM nebo HHMM" onkeydown="handleTimeModalKeyDown(event)" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-mono font-bold text-center text-base">
+            <div class="flex justify-end gap-2 pt-1">
+                <button onclick="closeModal('time-modal')" class="bg-slate-200 dark:bg-slate-700 font-bold px-3 py-1 rounded text-xs">Zrušit</button>
+                <button onclick="saveTimeModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1 rounded text-xs">Uložit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODÁLNÍ OKNO NASTAVENÍ -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-md w-full p-4 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-sm">Nastavení systému</h3>
+                <button onclick="closeModal('settings-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+
+            <!-- INFORMACE O PŘIHLÁŠENÍ -->
+            <div class="bg-slate-100 p-2.5 rounded border border-slate-200 dark:border-slate-700 text-xs">
+                <span class="text-slate-400 block font-bold text-[10px] uppercase">Přihlášený uživatel:</span>
+                <span class="font-black text-blue-500 text-sm" id="logged-user-name">Načítám...</span>
+            </div>
+
+            <!-- ADMIN SEKCE PRO SPRÁVU UŽIVATELŮ -->
+            <div id="admin-users-section" class="hidden border border-amber-300 p-3 rounded bg-amber-50 dark:bg-amber-950/30 space-y-2">
+                <span class="font-black text-xs text-amber-600 block">Správa dispečerů (Admin)</span>
+                <div id="admin-users-list" class="space-y-1.5 max-h-40 overflow-y-auto">Načítám uživatele...</div>
+            </div>
+
+            <!-- FORMULÁŘ ZMĚNY HESLA -->
+            <div class="bg-slate-50 p-3 rounded border border-slate-200 dark:border-slate-700 space-y-2">
+                <span class="font-extrabold text-xs block text-blue-500">Změna vlastního hesla</span>
+                <input type="password" id="chpass-old" placeholder="Původní heslo" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 rounded text-xs font-bold">
+                <input type="password" id="chpass-new1" placeholder="Nové heslo" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 rounded text-xs font-bold">
+                <input type="password" id="chpass-new2" placeholder="Potvrzení nového hesla" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-300 rounded text-xs font-bold">
+                
+                <div id="chpass-msg" class="text-[11px] font-bold hidden p-1 text-center rounded"></div>
+
+                <button onclick="handleChangePasswordSubmit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 rounded text-xs">
+                    Uložit nové heslo
+                </button>
+            </div>
+
+            <!-- PŘEPÍNAČ REŽIMU + UPOZORNĚNÍ -->
+            <div class="bg-slate-100 p-3 rounded border border-slate-200 dark:border-slate-700 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-xs">Režim zobrazení:</span>
+                    <button onclick="toggleDarkMode()" id="dark-mode-btn" class="bg-slate-800 text-white dark:bg-amber-400 dark:text-slate-900 font-bold px-3 py-1 rounded text-xs shadow">
+                        🌙 Tmavý / Světlý
+                    </button>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-bold leading-relaxed pt-1 border-t border-slate-200 dark:border-slate-700">
+                    Volba režimu (tmavý/světlý) závisí především na nastavení Vašeho zařízení, pokud Vaše zařízení bude mít nastavený např. tmavý režim a zde si nastavíte režim světlý, některá vykreslení nemusí být správná, jak je nastaveno Vaše zařízení naleznete v nastavení Vašeho zařízení.
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold mb-1.5 text-xs">Písmo aplikace:</label>
+                <select id="font-select" onchange="setFont(this.value)" class="w-full p-2 bg-slate-100 rounded font-bold text-xs border border-slate-300">
+                    <option value="system">Systémové (Výchozí)</option>
+                    <option value="inter">Inter (Moderní)</option>
+                    <option value="roboto">Roboto Condensed (Letecké)</option>
+                </select>
+            </div>
+
+            <!-- KONTAKT NA ADMINISTRÁTORA & COPYRIGHT -->
+            <div class="border-t pt-3 border-slate-200 dark:border-slate-700 text-center space-y-1 text-[11px]">
+                <div class="font-bold text-slate-400">KONTAKT NA ADMINISTRÁTORA:</div>
+                <div class="font-black">Vojtěch Vejsada</div>
+                <div class="text-slate-400">Tel: <a href="tel:+420601325949" class="text-blue-500 hover:underline">601 325 949</a></div>
+                <div class="text-slate-400">Email: <a href="mailto:vojta.vejsada@gmail.com" class="text-blue-500 hover:underline">vojta.vejsada@gmail.com</a></div>
+                <div class="text-[10px] text-slate-500 pt-2 font-bold">
+                    © 2026 Vojtěch Vejsada. Všechna práva vyhrazena.
+                </div>
+            </div>
+
+            <div class="border-t pt-2 border-slate-200 dark:border-slate-700 text-right">
+                <button onclick="closeModal('settings-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded text-xs">Zavřít</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODÁLNÍ OKNO EXPORT -->
+    <div id="export-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="flat-card max-w-2xl w-full p-5 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
+                <h3 class="font-extrabold text-base">Export dat (A1:H pro Tabulky / Excel)</h3>
+                <button onclick="closeModal('export-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+            <textarea id="export-area" readonly class="w-full h-64 p-3 bg-slate-50 border border-slate-300 rounded text-xs font-mono select-all focus:outline-none"></textarea>
+            <div class="flex justify-between items-center">
+                <span class="text-xs text-slate-400">Exportují se pouze lety s vyplněným časem vzletu nebo přistání.</span>
+                <div class="flex gap-2">
+                    <button onclick="copyExportText()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded text-xs">Zkopírovat</button>
+                    <button onclick="closeModal('export-modal')" class="bg-slate-200 dark:bg-slate-700 font-bold px-4 py-2 rounded text-xs">Zavřít</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIKA -->
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzGiopIdMHM4MRetDnp3uj_T3c64KjfwMVBAp59AZ9hs-uAcR3vmW-3aaYcXYiECpJg/exec";
+
+        let showFinished = false;
+        let activeTimeTarget = { idx: null, field: null };
+        let activeBellIndex = null;
+        let currentUser = null;
+        let aircraftDatabase = {};
+        let cachedNavestniData = null;
+
+        let flights = [];
+        let gliderFlights = [];
+        let gliderHistory = [];
+        let activeGliderTab = 'returns';
+
+        async function sha256(str) {
+            const buffer = new TextEncoder().encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function loadAircraftDatabase() {
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_acft' })
+                });
+                const res = await response.json();
+                if (res.success) {
+                    aircraftDatabase = res.acft || {};
+                }
+            } catch (e) {}
+        }
+
+        function switchLoginView(view) {
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('reg-error').classList.add('hidden');
+            if (view === 'register') {
+                document.getElementById('form-login').classList.add('hidden');
+                document.getElementById('form-register').classList.remove('hidden');
+            } else {
+                document.getElementById('form-register').classList.add('hidden');
+                document.getElementById('form-login').classList.remove('hidden');
+            }
+        }
+
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errEl = document.getElementById('login-error');
+            const btnEl = document.getElementById('login-btn');
+
+            errEl.classList.add('hidden');
+            btnEl.innerText = "OVĚŘUJI...";
+            btnEl.disabled = true;
+
+            try {
+                const passHash = await sha256(password);
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', email: email, passHash: passHash })
+                });
+
+                const resData = await response.json();
+                if (resData.success) {
+                    currentUser = resData.user;
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    document.getElementById('logged-user-name').innerText = `${resData.user.name} (${resData.user.role.toUpperCase()})`;
+                    loadAircraftDatabase();
+                    fetchRegQnhFromSheets();
+                } else {
+                    errEl.innerText = resData.message || "Chybné přihlašovací údaje.";
+                    errEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errEl.innerText = "Chyba při komunikaci s databází.";
+                errEl.classList.remove('hidden');
+            } finally {
+                btnEl.innerText = "PŘIHLÁSIT SE DO SLUŽBY";
+                btnEl.disabled = false;
+            }
+        }
+
+        async function handleRegisterCheck(e) {
+            e.preventDefault();
+            const email = document.getElementById('reg-email').value;
+            const errEl = document.getElementById('reg-error');
+            const btnEl = document.getElementById('reg-btn');
+            const passFields = document.getElementById('reg-password-fields');
+
+            errEl.classList.add('hidden');
+
+            if (!passFields.classList.contains('hidden')) {
+                const p1 = document.getElementById('reg-pass1').value;
+                const p2 = document.getElementById('reg-pass2').value;
+
+                if (!p1 || p1.length < 4) {
+                    errEl.innerText = "Heslo musí mít alespoň 4 znaky.";
+                    errEl.classList.remove('hidden');
+                    return;
+                }
+                if (p1 !== p2) {
+                    errEl.innerText = "Zadaná hesla se neshodují.";
+                    errEl.classList.remove('hidden');
+                    return;
+                }
+
+                btnEl.innerText = "UKLÁDÁM HESLO...";
+                btnEl.disabled = true;
+
+                try {
+                    const newHash = await sha256(p1);
+                    const response = await fetch(GAS_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'set_first_password', email: email, newHash: newHash })
+                    });
+                    const resData = await response.json();
+                    if (resData.success) {
+                        currentUser = resData.user;
+                        document.getElementById('login-screen').classList.add('hidden');
+                        document.getElementById('app-screen').classList.remove('hidden');
+                        document.getElementById('logged-user-name').innerText = `${resData.user.name} (${resData.user.role.toUpperCase()})`;
+                        loadAircraftDatabase();
+                        fetchRegQnhFromSheets();
+                    } else {
+                        errEl.innerText = resData.message || "Chyba při ukládání.";
+                        errEl.classList.remove('hidden');
+                    }
+                } catch (err) {
+                    errEl.innerText = "Chyba komunikace se serverem.";
+                    errEl.classList.remove('hidden');
+                } finally {
+                    btnEl.innerText = "DOKONČIT REGISTRACI";
+                    btnEl.disabled = false;
+                }
+                return;
+            }
+
+            btnEl.innerText = "OVĚŘUJI E-MAIL...";
+            btnEl.disabled = true;
+
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'check_registration', email: email })
+                });
+
+                const resData = await response.json();
+                if (resData.success && resData.canRegister) {
+                    document.getElementById('reg-welcome-msg').innerText = `Vítejte, ${resData.name}! Zadejte své nové heslo.`;
+                    passFields.classList.remove('hidden');
+                    document.getElementById('reg-email').readOnly = true;
+                    btnEl.innerText = "DOKONČIT REGISTRACI";
+                } else {
+                    errEl.innerText = resData.message || "E-mail nebyl nalezen.";
+                    errEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errEl.innerText = "Chyba komunikace s databází.";
+                errEl.classList.remove('hidden');
+            } finally {
+                btnEl.disabled = false;
+            }
+        }
+
+        async function handleChangePasswordSubmit() {
+            const oldP = document.getElementById('chpass-old').value;
+            const newP1 = document.getElementById('chpass-new1').value;
+            const newP2 = document.getElementById('chpass-new2').value;
+            const msgEl = document.getElementById('chpass-msg');
+
+            msgEl.classList.add('hidden');
+
+            if (!oldP || !newP1) {
+                msgEl.innerText = "Vyplňte všechna pole.";
+                msgEl.className = "text-[11px] font-bold p-1 text-center rounded bg-red-100 text-red-600";
+                msgEl.classList.remove('hidden');
+                return;
+            }
+            if (newP1 !== newP2) {
+                msgEl.innerText = "Nová hesla se neshodují.";
+                msgEl.className = "text-[11px] font-bold p-1 text-center rounded bg-red-100 text-red-600";
+                msgEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const oldHash = await sha256(oldP);
+                const newHash = await sha256(newP1);
+
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'change_password',
+                        email: currentUser.email,
+                        oldHash: oldHash,
+                        newHash: newHash
+                    })
+                });
+
+                const resData = await response.json();
+                if (resData.success) {
+                    msgEl.innerText = "Heslo bylo úspěšně změněno!";
+                    msgEl.className = "text-[11px] font-bold p-1 text-center rounded bg-emerald-100 text-emerald-700";
+                    msgEl.classList.remove('hidden');
+                    document.getElementById('chpass-old').value = '';
+                    document.getElementById('chpass-new1').value = '';
+                    document.getElementById('chpass-new2').value = '';
+                } else {
+                    msgEl.innerText = resData.message || "Původní heslo nesouhlasí.";
+                    msgEl.className = "text-[11px] font-bold p-1 text-center rounded bg-red-100 text-red-600";
+                    msgEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                msgEl.innerText = "Chyba při komunikaci s databází.";
+                msgEl.className = "text-[11px] font-bold p-1 text-center rounded bg-red-100 text-red-600";
+                msgEl.classList.remove('hidden');
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+        }
+
+        function handleLogout() {
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+            document.getElementById('rwy-val').innerText = '- -';
+            document.getElementById('okruhy-val').innerText = '- -';
+            document.getElementById('qnh-val').innerText = '- -';
+            switchLoginView('login');
+        }
+
+        function openRwyModal() { document.getElementById('rwy-modal').style.display = 'flex'; }
+        function selectRwy(val) {
+            document.getElementById('rwy-val').innerText = val || '- -';
+            document.getElementById('okruhy-val').innerText = val === '11' ? 'PRAVÉ' : (val === '29' ? 'LEVÉ' : '- -');
+            closeModal('rwy-modal');
+        }
+
+        function openQnhModal() {
+            const grid = document.getElementById('qnh-grid');
+            grid.innerHTML = '';
+            
+            const currentQnh = document.getElementById('qnh-val').innerText.trim();
+
+            const btnNull = document.createElement('button');
+            btnNull.className = 'p-2 bg-slate-200 dark:bg-slate-700 hover:bg-red-600 hover:text-white font-black rounded text-xs text-center col-span-4 mb-1';
+            btnNull.innerText = '- - (VYPNUTO)';
+            btnNull.onclick = () => {
+                document.getElementById('qnh-val').innerText = '- -';
+                closeModal('qnh-modal');
+            };
+            grid.appendChild(btnNull);
+
+            for (let q = 1035; q >= 993; q--) {
+                const btn = document.createElement('button');
+                const isCurrent = (String(q) === currentQnh);
+                
+                if (isCurrent) {
+                    btn.className = 'p-2 bg-emerald-600 text-white font-black rounded text-xs text-center border-2 border-white shadow';
+                } else {
+                    btn.className = 'p-2 bg-slate-100 dark:bg-slate-700 hover:bg-blue-600 hover:text-white font-black rounded text-xs text-center';
+                }
+                
+                btn.innerText = q;
+                btn.onclick = () => {
+                    document.getElementById('qnh-val').innerText = q;
+                    closeModal('qnh-modal');
+                };
+                grid.appendChild(btn);
+            }
+            document.getElementById('qnh-modal').style.display = 'flex';
+        }
+
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
+        function checkNoteState(inputEl) {
+            if (inputEl.value.trim() !== '') {
+                inputEl.classList.add('has-note');
+            } else {
+                inputEl.classList.remove('has-note');
+            }
+        }
+
+        function updateClocks() {
+            const now = new Date();
+            const utc = now.toISOString().substr(11, 5);
+            const loc = now.toTimeString().substr(0, 5);
+            document.getElementById('utc-clock').innerText = utc;
+            document.getElementById('local-clock').innerText = loc;
+
+            const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
+            const dayName = days[now.getDay()];
+            const dateStr = `${dayName} ${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+            document.getElementById('date-display').innerText = dateStr;
+
+            flights.forEach(f => {
+                if (f.alarm && !f.alarm.triggered) {
+                    if (f.alarm.type === 'return' || f.alarm.type === 'time') {
+                        if (f.alarm.time && utc >= f.alarm.time) {
+                            f.alarm.triggered = true;
+                            if (f.alarm.type === 'return') {
+                                triggerAlertBanner(`⚠️ HLÍDÁNÍ NÁVRATU: Letadlo ${f.callsign} se již mělo vrátit! (${f.alarm.time} UTC)`);
+                            } else {
+                                triggerAlertBanner(`🔔 UPOZORNĚNÍ [${f.callsign}]: ${f.alarm.msg || 'Časové upozornění'}`);
+                            }
+                            renderStrips();
+                        }
+                    }
+                }
+            });
+
+            const min = now.getUTCMinutes();
+            const sec = now.getUTCSeconds();
+            if (sec === 0 && [1, 3, 5].includes(min)) {
+                fetchRegQnhFromSheets();
+            }
+        }
+        setInterval(updateClocks, 1000);
+        updateClocks();
+
+        function triggerAlertBanner(text) {
+            const container = document.getElementById('alert-container');
+            const box = document.createElement('div');
+            box.className = 'alert-banner bg-red-600 text-white font-black p-3.5 rounded-lg shadow-2xl border-2 border-white flex justify-between items-center text-sm pointer-events-auto';
+            box.innerHTML = `
+                <span>${text}</span>
+                <button onclick="this.parentElement.remove()" class="ml-4 bg-white/20 hover:bg-white/40 px-2.5 py-1 rounded text-xs font-bold">ROZUMÍM</button>
+            `;
+            container.appendChild(box);
+        }
+
+        async function fetchRegQnhFromSheets() {
+            const bar = document.getElementById('qnh-bar-text');
+            bar.innerText = "Načítám...";
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_meteo_qnh' })
+                });
+                const res = await response.json();
+                if (res.success && res.qnh) {
+                    bar.innerText = res.qnh;
+                } else {
+                    bar.innerHTML = '<span class="text-red-500 font-extrabold">NELZE NAČÍST</span>';
+                }
+            } catch (e) {
+                bar.innerHTML = '<span class="text-red-500 font-extrabold">NELZE NAČÍST</span>';
+            }
+        }
+
+        function calculateDuration(vzlet, pristani) {
+            if (!vzlet || !pristani || vzlet === '--:--' || pristani === '--:--' || pristani === '-') return '--:--';
+            const [vH, vM] = vzlet.split(':').map(Number);
+            const [pH, pM] = pristani.split(':').map(Number);
+            if (isNaN(vH) || isNaN(vM) || isNaN(pH) || isNaN(pM)) return '--:--';
+
+            let durationMinutes = (pH * 60 + pM) - (vH * 60 + vM);
+            if (durationMinutes < 0) durationMinutes += 24 * 60;
+
+            const dH = String(Math.floor(durationMinutes / 60)).padStart(2, '0');
+            const dM = String(durationMinutes % 60).padStart(2, '0');
+            return `${dH}:${dM}`;
+        }
+
+        let draggedIndex = null;
+
+        function renderStrips() {
+            const container = document.getElementById('strips-container');
+            container.innerHTML = '';
+
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+
+            flights.forEach((f, idx) => {
+                const hasCallsign = f.callsign && f.callsign !== 'OK-';
+                const hasTakeoff = f.vzlet && f.vzlet !== '--:--' && f.vzlet !== '-';
+                const hasLanding = f.pristani && f.pristani !== '--:--' && f.pristani !== '-';
+                const countVal = parseFloat(f.pristaniCount) || 0;
+
+                if (!f.radio && hasCallsign && !f.needsLandingInput) {
+                    if (hasTakeoff && hasLanding) {
+                        if (countVal >= 1) f.isFinished = true;
+                    } else if (hasTakeoff || hasLanding) {
+                        if (countVal >= 0.5) f.isFinished = true;
+                    }
+                }
+            });
+
+            flights.sort((a, b) => {
+                if (a.isEditing && !b.isEditing) return -1;
+                if (!a.isEditing && b.isEditing) return 1;
+                if (!a.isFinished && b.isFinished) return -1;
+                if (a.isFinished && !b.isFinished) return 1;
+                if (a.radio && !b.radio) return -1;
+                if (!a.radio && b.radio) return 1;
+                return 0;
+            });
+
+            let totalLandings = 0;
+            let radioCount = 0;
+
+            flights.forEach((f, idx) => {
+                totalLandings += (parseFloat(f.pristaniCount) || 0);
+                if (f.radio && !f.isFinished) radioCount++;
+
+                if (f.isFinished && !showFinished) return;
+                if (searchQuery) {
+                    const matchCallsign = (f.callsign || '').toLowerCase().includes(searchQuery);
+                    const matchPic = (f.pic || '').toLowerCase().includes(searchQuery);
+                    if (!matchCallsign && !matchPic) return;
+                }
+
+                const card = document.createElement('div');
+                card.draggable = true;
+                card.className = `strip-row p-2 text-xs font-medium ${f.radio && !f.isFinished ? 'strip-row-active' : ''} ${f.isFinished ? 'strip-row-finished' : ''}`;
+
+                card.addEventListener('dragstart', () => { draggedIndex = idx; });
+                card.addEventListener('dragover', (e) => { e.preventDefault(); });
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (draggedIndex !== null && draggedIndex !== idx) {
+                        const moved = flights.splice(draggedIndex, 1)[0];
+                        flights.splice(idx, 0, moved);
+                        renderStrips();
+                    }
+                });
+
+                if (f.isEditing) {
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-1.5 mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-emerald-500">#${idx + 1}</span>
+                                <span class="font-black text-slate-900 dark:text-slate-100 text-base">${f.callsign || 'NOVÝ LET'}</span>
+                            </div>
+                            <button onclick="deleteFlight(${idx})" class="text-red-500 font-bold text-xs hover:underline">Smazat let</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-2 items-end">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">CALLSIGN</label>
+                                <input type="text" id="cs-${idx}" value="${f.callsign}" oninput="onCallsignInput(${idx})" onkeydown="handleKeyDown(event, ${idx}, 'cs')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-black uppercase text-slate-900 dark:text-slate-100">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">TYP</label>
+                                <input type="text" id="type-${idx}" value="${f.type}" placeholder="např. C172" onkeydown="handleKeyDown(event, ${idx}, 'type')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">PIC</label>
+                                <input type="text" id="pic-${idx}" value="${f.pic}" placeholder="Jméno" onkeydown="handleKeyDown(event, ${idx}, 'pic')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">POB</label>
+                                <input type="text" id="pob-${idx}" list="pob-list" value="${f.pob}" placeholder="X, -, 1-4" onkeydown="handleKeyDown(event, ${idx}, 'pob')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium text-center">
+                                <datalist id="pob-list">
+                                    <option value="X"><option value="-"><option value="1"><option value="2"><option value="3"><option value="4">
+                                </datalist>
+                            </div>
+                            <div class="md:col-span-2 flex items-center gap-2">
+                                <div class="flex-1">
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">POZNÁMKA</label>
+                                    <input type="text" id="remark-${idx}" value="${f.remark}" onkeydown="handleKeyDown(event, ${idx}, 'remark')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium">
+                                </div>
+                                <button onclick="saveEdit(${idx})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded text-xs self-end">Uložit</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="grid grid-cols-12 items-center gap-2">
+                            <div class="col-span-12 md:col-span-4 flex items-center gap-2.5">
+                                <span class="drag-handle text-slate-400 font-bold" title="Přetáhnout strip">⋮⋮</span>
+                                <span class="font-bold text-emerald-500 text-xs w-4">#${idx + 1}</span>
+                                <button onclick="toggleRadio(${idx})" class="headset-btn ${f.radio ? 'active' : ''}" title="Spojení">
+                                    🎧
+                                </button>
+                                <button onclick="openBellModal(${idx})" class="bell-btn ${f.alarm ? 'active' : ''}" title="Hlídání a zprávy">
+                                    🔔
+                                </button>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="callsign-text text-slate-900 dark:text-slate-100 text-xl tracking-wide cursor-pointer ${f.radio ? 'font-black' : 'font-bold'}" onclick="toggleEdit(${idx})">${f.callsign}</span>
+                                        ${f.type ? `<span class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black px-2 py-0.5 rounded">${f.type}</span>` : ''}
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-2">
+                                        ${f.pic ? `<span>PIC: <b>${f.pic}</b></span>` : ''}
+                                        ${f.pob ? `<span>POB: <b>${f.pob}</b></span>` : ''}
+                                        ${f.remark ? `<span class="text-slate-400">| ${f.remark}</span>` : ''}
+                                        ${f.alarm ? `<span class="text-amber-500 font-bold">| 🔔 ${f.alarm.type === 'landing' ? 'Zpráva po přistání' : f.alarm.time}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-span-6 md:col-span-3 flex items-center justify-center gap-4">
+                                <div class="text-center">
+                                    ${f.vzlet && f.vzlet !== '--:--' ? `
+                                        <span class="block text-[8px] font-extrabold text-slate-400 uppercase">VZLET</span>
+                                        <span onclick="openTimeModal(${idx}, 'vzlet')" class="time-display-text font-mono font-black text-slate-900 dark:text-slate-100 text-base cursor-pointer">${f.vzlet}</span>
+                                    ` : `
+                                        <button onclick="setNowTime(${idx}, 'vzlet')" class="btn-action-takeoff">VZLET</button>
+                                    `}
+                                </div>
+                                <div class="text-center">
+                                    ${f.pristani && f.pristani !== '--:--' ? `
+                                        <span class="block text-[8px] font-extrabold text-slate-400 uppercase">PŘISTÁNÍ</span>
+                                        <span onclick="openTimeModal(${idx}, 'pristani')" class="time-display-text font-mono font-black text-slate-900 dark:text-slate-100 text-base cursor-pointer">${f.pristani}</span>
+                                    ` : `
+                                        <button onclick="setNowTime(${idx}, 'pristani')" class="btn-action-landing">PŘISTÁNÍ</button>
+                                    `}
+                                </div>
+                            </div>
+
+                            <div class="col-span-6 md:col-span-2 text-center flex flex-col items-center">
+                                <span class="block text-[8px] font-extrabold text-slate-400 uppercase">PŘISTÁNÍ</span>
+                                <div class="inline-flex items-center border border-slate-300 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-900 p-0.5">
+                                    <button onclick="changeLanding(${idx}, -0.5)" class="text-slate-400 font-bold px-1.5 text-xs">-</button>
+                                    <span class="font-extrabold text-slate-900 dark:text-slate-100 w-5 text-center text-xs">${f.pristaniCount || 0}</span>
+                                    <button onclick="changeLanding(${idx}, 0.5)" class="text-slate-400 font-bold px-1.5 text-xs">+</button>
+                                </div>
+                            </div>
+
+                            <div class="col-span-12 md:col-span-3 flex items-center justify-end gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-slate-700">
+                                <div class="text-center pr-2">
+                                    <span class="block text-[8px] font-extrabold text-slate-400 uppercase">ČAS LETU</span>
+                                    <span class="font-mono text-xs font-bold text-slate-400">
+                                        ${calculateDuration(f.vzlet, f.pristani)}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="forceFinishFlight(${idx})" class="btn-ui bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold px-2 py-1 rounded text-[10px]" title="Ukončit">UKONČIT</button>
+                                    <button onclick="toggleEdit(${idx})" class="p-1 text-slate-400 hover:text-blue-500 text-xs font-bold">UPRAVIT</button>
+                                    <button onclick="deleteFlight(${idx})" class="p-1 text-slate-400 hover:text-red-500 text-xs font-bold">SMAZAT</button>
+                                </div>
+                            </div>
+                        </div>
+                        ${f.needsLandingInput ? `
+                            <div class="mt-2 pt-2 border-t border-amber-300 bg-amber-50 dark:bg-amber-950/40 p-1.5 rounded flex items-center justify-between text-amber-800 dark:text-amber-300 font-black text-xs">
+                                <span>⚠️ LET NELZE UKONČIT: CHYBÍ VYPLNĚNÝ POČET PŘISTÁNÍ</span>
+                                <button onclick="confirmLandingAndFinish(${idx})" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded shadow">POTVRDIT ÚDAJE</button>
+                            </div>
+                        ` : ''}
+                    `;
+                }
+
+                container.appendChild(card);
+            });
+
+            document.getElementById('cnt-landings').innerText = totalLandings;
+            document.getElementById('cnt-pohyby').innerText = totalLandings * 2;
+            document.getElementById('cnt-radio').innerText = radioCount;
+        }
+
+        function onCallsignInput(idx) {
+            const csInp = document.getElementById(`cs-${idx}`);
+            const typeInp = document.getElementById(`type-${idx}`);
+            const remarkInp = document.getElementById(`remark-${idx}`);
+            if (!csInp) return;
+
+            let val = csInp.value.toUpperCase().replace(/\s+/g, '');
+
+            if (val.startsWith('OK-')) {
+                let rest = val.substring(3);
+                if (/^[A-Z]{3}\d+$/.test(rest)) {
+                    let letters = rest.substring(0, 3);
+                    let numbers = rest.substring(3);
+                    val = `OK-${letters} ${numbers}`;
+                }
+            }
+
+            csInp.value = val;
+
+            const cleanVal = val.replace(' ', '');
+            if (aircraftDatabase[cleanVal]) {
+                const acftInfo = aircraftDatabase[cleanVal];
+                if (typeInp) {
+                    typeInp.value = acftInfo.type || "";
+                    typeInp.dataset.autofilled = "true";
+                }
+                if (acftInfo.start && remarkInp && (!remarkInp.value || remarkInp.dataset.autostart === "true")) {
+                    remarkInp.value = acftInfo.start;
+                    remarkInp.dataset.autostart = "true";
+                }
+            } else {
+                if (typeInp) {
+                    typeInp.value = "";
+                    typeInp.dataset.autofilled = "false";
+                }
+                if (remarkInp && remarkInp.dataset.autostart === "true") {
+                    remarkInp.value = "";
+                    remarkInp.dataset.autostart = "false";
+                }
+            }
+        }
+
+        function onGliderCallsignInput() {
+            const csInp = document.getElementById('g-callsign');
+            const typeInp = document.getElementById('g-type');
+            const startInp = document.getElementById('g-start');
+            if (!csInp || !typeInp) return;
+
+            let val = csInp.value.toUpperCase().replace(/\s+/g, '');
+            if (val.startsWith('OK-')) {
+                let rest = val.substring(3);
+                if (/^[A-Z]{3}\d+$/.test(rest)) {
+                    val = `OK-${rest.substring(0,3)} ${rest.substring(3)}`;
+                } else if (/^\d{4}$/.test(rest)) {
+                    val = `OK-${rest}`;
+                }
+            }
+            csInp.value = val;
+
+            const cleanVal = val.replace(' ', '');
+            if (aircraftDatabase[cleanVal]) {
+                const acftInfo = aircraftDatabase[cleanVal];
+                typeInp.value = acftInfo.type || "";
+                if (acftInfo.start && startInp && (!startInp.value || startInp.dataset.autostart === "true")) {
+                    startInp.value = acftInfo.start;
+                    startInp.dataset.autostart = "true";
+                }
+            } else {
+                typeInp.value = "";
+                if (startInp && startInp.dataset.autostart === "true") {
+                    startInp.value = "";
+                    startInp.dataset.autostart = "false";
+                }
+            }
+        }
+
+        function handleKeyDown(e, idx, field) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const typeInp = document.getElementById(`type-${idx}`);
+                
+                if (field === 'cs' && typeInp && typeInp.dataset.autofilled === "true") {
+                    const picInp = document.getElementById(`pic-${idx}`);
+                    if (picInp) picInp.focus();
+                    return;
+                }
+
+                const sequence = ['cs', 'type', 'pic', 'pob', 'remark'];
+                const currentPos = sequence.indexOf(field);
+                if (currentPos !== -1 && currentPos < sequence.length - 1) {
+                    const nextEl = document.getElementById(`${sequence[currentPos + 1]}-${idx}`);
+                    if (nextEl) nextEl.focus();
+                } else {
+                    saveEdit(idx);
+                }
+            }
+        }
+
+        function handleGliderKeyDown(e, field) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const sequence = ['callsign', 'type', 'start', 'remark'];
+                const mapIds = { 'callsign': 'g-callsign', 'type': 'g-type', 'start': 'g-start', 'remark': 'g-remark' };
+                const currentPos = sequence.indexOf(field);
+
+                if (currentPos !== -1 && currentPos < sequence.length - 1) {
+                    const nextEl = document.getElementById(mapIds[sequence[currentPos + 1]]);
+                    if (nextEl) nextEl.focus();
+                } else {
+                    saveNewGliderFlight();
+                }
+            }
+        }
+
+        function handleTimeModalKeyDown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveTimeModal();
+            }
+        }
+
+        function handleBellKeyDown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveBellAlarm();
+            }
+        }
+
+        function toggleGliderDropdown() {
+            const dropdown = document.getElementById('glider-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('#glider-dropdown') && !e.target.closest('button[onclick="toggleGliderDropdown()"]')) {
+                document.getElementById('glider-dropdown').classList.add('hidden');
+            }
+        });
+
+        function openGliderModal(action) {
+            document.getElementById('glider-dropdown').classList.add('hidden');
+            if (action === 'insert') {
+                document.getElementById('g-callsign').value = 'OK-';
+                document.getElementById('g-type').value = '';
+                document.getElementById('g-start').value = '';
+                document.getElementById('g-remark').value = '';
+                document.getElementById('glider-insert-modal').style.display = 'flex';
+                setTimeout(() => document.getElementById('g-callsign').focus(), 50);
+            } else if (action === 'returns') {
+                activeGliderTab = 'returns';
+                document.getElementById('glider-floating-window').classList.remove('hidden');
+                renderGliderWindow();
+            }
+        }
+
+        function closeGliderWindow() {
+            document.getElementById('glider-floating-window').classList.add('hidden');
+        }
+
+        function saveNewGliderFlight() {
+            const cs = document.getElementById('g-callsign').value.trim();
+            const type = document.getElementById('g-type').value.trim();
+            const start = document.getElementById('g-start').value.trim();
+            const remark = document.getElementById('g-remark').value.trim();
+
+            if (!cs || cs === 'OK-') {
+                alert("Zadejte prosím platný volací znak.");
+                return;
+            }
+
+            gliderFlights.push({
+                id: Date.now(),
+                callsign: cs,
+                type: type,
+                start: start,
+                remark: remark
+            });
+
+            renderGliderWindow();
+
+            document.getElementById('g-callsign').value = 'OK-';
+            document.getElementById('g-type').value = '';
+            document.getElementById('g-start').value = '';
+            document.getElementById('g-remark').value = '';
+            document.getElementById('g-callsign').focus();
+        }
+
+        function switchGliderTab(tab) {
+            activeGliderTab = tab;
+            renderGliderWindow();
+        }
+
+        function confirmGliderReturn(id) {
+            const idx = gliderFlights.findIndex(g => g.id === id);
+            if (idx !== -1) {
+                const flight = gliderFlights.splice(idx, 1)[0];
+                const now = new Date();
+                const returnTime = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')}`;
+                
+                gliderHistory.unshift({
+                    ...flight,
+                    returnTime: returnTime
+                });
+                renderGliderWindow();
+            }
+        }
+
+        function renderGliderWindow() {
+            const titleEl = document.getElementById('glider-window-title');
+            const contentEl = document.getElementById('glider-window-content');
+            contentEl.innerHTML = '';
+
+            if (activeGliderTab === 'returns') {
+                titleEl.innerText = "VĚTRONĚ - NÁVRATY (Aktivní)";
+                if (gliderFlights.length === 0) {
+                    contentEl.innerHTML = '<div class="text-center text-slate-400 py-6 font-bold">Žádné větroně na provozu.</div>';
+                    return;
+                }
+
+                gliderFlights.forEach(g => {
+                    const row = document.createElement('div');
+                    row.className = 'p-2.5 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 space-y-1.5';
+                    row.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-black text-sm text-slate-900 dark:text-slate-100">${g.callsign} ${g.type ? '('+g.type+')' : ''}</span>
+                            <button onclick="confirmGliderReturn(${g.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded text-[11px] shadow">POTVRDIT NÁVRAT</button>
+                        </div>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap gap-2">
+                            ${g.start ? `<span>Start: <b>${g.start}</b></span>` : ''}
+                            ${g.remark ? `<span>Pozn: <b>${g.remark}</b></span>` : ''}
+                        </div>
+                    `;
+                    contentEl.appendChild(row);
+                });
+            } else {
+                titleEl.innerText = "VĚTRONĚ - HISTORIE NÁVRATŮ";
+                if (gliderHistory.length === 0) {
+                    contentEl.innerHTML = '<div class="text-center text-slate-400 py-6 font-bold">Zatím žádné potvrzené návraty dnes.</div>';
+                    return;
+                }
+
+                gliderHistory.forEach(h => {
+                    const row = document.createElement('div');
+                    row.className = 'p-2 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 flex justify-between items-center';
+                    row.innerHTML = `
+                        <div>
+                            <div class="font-black text-slate-800 dark:text-slate-200">${h.callsign} ${h.type ? '('+h.type+')' : ''}</div>
+                            <div class="text-[10px] text-slate-400">${h.start ? 'Start: '+h.start+' | ' : ''}${h.remark ? 'Pozn: '+h.remark : ''}</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] uppercase text-slate-400 block">Návrat UTC</span>
+                            <span class="font-mono font-bold text-emerald-600 text-xs">${h.returnTime}</span>
+                        </div>
+                    `;
+                    contentEl.appendChild(row);
+                });
+            }
+        }
+
+        const floatWin = document.getElementById('glider-floating-window');
+        const dragHandle = document.getElementById('glider-drag-handle');
+        let isDragging = false, startX, startY, initialLeft, initialTop;
+
+        dragHandle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = floatWin.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            floatWin.style.left = `${initialLeft}px`;
+            floatWin.style.top = `${initialTop}px`;
+            floatWin.style.right = 'auto';
+            floatWin.style.bottom = 'auto';
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            floatWin.style.left = `${initialLeft + dx}px`;
+            floatWin.style.top = `${initialTop + dy}px`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        const checklistData = {
+            before: [
+                "PŘÍPRAVA STANOVIŠTĚ - PRIMÁRNĚ VĚŽ (U ALTERNATIVNÍHO - PŘÍPRAVA DOKUMENTŮ A PŘENOSNÉ, SCHVÁLENÉ RDST)",
+                "POHOTOVOSTNÍ VOZIDLO - KONTROLA VOZIDLA I ZÁCHRANNÉHO VYBAVENÍ (ZDA JE KOMPLETNÍ A NENÍ POŠKOZENO)",
+                "PERSONÁL ZAJIŠŤUJÍCÍ HASIČSKOU A ZÁCHRANNOU SLUŽBU + ZPŮSOB SPOJENÍ OPI S TÍMTO PERSONÁLEM (MINIMÁLNĚ: POHOTOVOSTNÍ ŘIDIČ + DISPEČER RADIO VE SLUŽBĚ = DVĚ OSOBY)",
+                "KONTROLA RWY (POHYBOVÉ PLOCHY) + ZÁPIS VÝSLEDKU KONTROLY DO PROVOZNÍHO DENÍKU",
+                "DRUH PROVOZU (MODELÁŘI/ULL/VÝCVIKY/NAVIJÁKY?)",
+                "NÁVĚSTNÍ PLOCHA - VYTÝČENÍ",
+                "KONTROLA NOTAMŮ, METEO, AUP/UUP (AISVIEW)",
+                "V PŘÍPADĚ POTŘEBY POUČIT OSOBY CHYSTAJÍCÍ SE DO PROVOZU",
+                "KONTROLA METEO ZAŘÍZENÍ, RDST A KOMPLETNOSTI VYBAVENÍ STANOVIŠTĚ",
+                "VYPLNĚNÍ PROVOZNÍHO DENÍKU (ÚVODNÍ STRANA - SEZNAM OPI A HLAVNÍ STRANA - VYPLNIT VŠE, CO JDE)"
+            ],
+            during: [
+                "ZAPISOVAT ZMĚNY A DŮLEŽITÁ SDĚLENÍ DO PROVOZNÍHO DENÍKU",
+                "V PŘÍPADĚ MIMOŘÁDNOSTI SE POSTUPUJE PODLE POHOTOVOSTNÍHO PLÁNU - K DISPOZICI V DOKUMENTACI DANÉHO STANOVIŠTĚ",
+                "ZAPISOVAT VZLETY A PŘISTÁNÍ CIZÍCH LETADEL (DENÍK EVIDENCE VZLETŮ A PŘISTÁNÍ)",
+                "PŘI PŘEBÍRÁNÍ/PŘEDÁVÁNÍ SLUŽBY ZAPSAT PŘEDÁNÍ SLUŽBY (JMÉNO, ČAS PŘEVZETÍ) DO PROVOZNÍHO DENÍKU"
+            ],
+            after: [
+                "ODEPSAT SEBE ZE SLUŽBY, ČAS UKONČENÍ PROVOZU, ODEPSAT DALŠÍ OSOBY VE FUNKCI, DOVYPLNIT DENÍK, ZRUŠIT VYTÝČENÍ NÁVĚSTNÍ PLOCHY",
+                "ZAJISTIT ÚKLID POHOTOVOSTNÍHO VOZIDLA (VČETNĚ INTERIÉRU), UKLIDIT KLÍČE NA PŘÍSLUŠNÉ MÍSTO",
+                "+ SPECIFIKA ALTERNATIVNÍHO STANOVIŠTĚ - UKLIDIT PŘENOSNOU RDST A DOKUMENTACI",
+                "POKUD JIŽ V AKHB NIKDO NENÍ - UZAMKNOUT PLNĚNÍ, HANGÁR A BUDOVU AKHB"
+            ]
+        };
+
+        function openChecklistModal() {
+            renderChecklist('before');
+            renderChecklist('during');
+            renderChecklist('after');
+            switchChecklistTab('before');
+            document.getElementById('checklist-modal').style.display = 'flex';
+        }
+
+        function renderChecklist(tab) {
+            const container = document.getElementById(`chk-content-${tab}`);
+            container.innerHTML = '';
+            checklistData[tab].forEach((item, i) => {
+                const row = document.createElement('label');
+                row.className = 'flex items-start gap-2.5 p-2 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800';
+                row.innerHTML = `<input type="checkbox" class="mt-0.5 w-4 h-4 rounded text-blue-600"><span>• ${item}</span>`;
+                container.appendChild(row);
+            });
+        }
+
+        function switchChecklistTab(tab) {
+            ['before', 'during', 'after'].forEach(t => {
+                document.getElementById(`chk-content-${t}`).classList.add('hidden');
+                document.getElementById(`chk-tab-${t}`).className = 'flex-1 py-2 font-black rounded text-xs bg-slate-100 dark:bg-slate-700';
+            });
+            document.getElementById(`chk-content-${tab}`).classList.remove('hidden');
+            document.getElementById(`chk-tab-${tab}`).className = 'flex-1 py-2 font-black rounded text-xs bg-blue-600 text-white';
+        }
+
+        async function openNavestniModal() {
+            const modal = document.getElementById('navestni-modal');
+            const img = document.getElementById('navestni-img');
+            const status = document.getElementById('navestni-status');
+            
+            modal.style.display = 'flex';
+            img.classList.add('hidden');
+            status.innerText = "Načítám...";
+            status.classList.remove('hidden');
+
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_navestni' })
+                });
+                const res = await response.json();
+
+                if (res.success) {
+                    cachedNavestniData = res;
+                    const activeRwy = document.getElementById('rwy-val').innerText.trim();
+                    if (activeRwy === '11') loadNavestniImgForRwy('11');
+                    else if (activeRwy === '29') loadNavestniImgForRwy('29');
+                    else if (activeRwy === 'CLSD') loadNavestniImgForRwy('CLSD');
+                    else loadNavestniImgForRwy('default');
+                } else {
+                    status.innerText = "Chyba při načítání databáze.";
+                }
+            } catch (e) {
+                status.innerText = "Chyba při komunikaci se serverem.";
+            }
+        }
+
+        function loadNavestniImgForRwy(mode) {
+            const img = document.getElementById('navestni-img');
+            const status = document.getElementById('navestni-status');
+            
+            ['default', '11', '29', 'clsd'].forEach(m => {
+                const btn = document.getElementById(`btn-nav-${m}`);
+                if (btn) btn.className = "bg-slate-200 dark:bg-slate-700 font-bold px-3 py-1 rounded text-xs";
+            });
+            const activeBtn = document.getElementById(`btn-nav-${mode.toLowerCase()}`);
+            if (activeBtn) activeBtn.className = "bg-blue-600 text-white font-bold px-3 py-1 rounded text-xs shadow";
+
+            if (!cachedNavestniData) return;
+
+            let targetUrl = cachedNavestniData.defaultUrl;
+            if (mode === '11') targetUrl = cachedNavestniData.rwy11Url;
+            if (mode === '29') targetUrl = cachedNavestniData.rwy29Url;
+            if (mode === 'CLSD') targetUrl = cachedNavestniData.rwyClsdUrl;
+
+            if (targetUrl && targetUrl.startsWith('http')) {
+                img.classList.add('hidden');
+                status.innerText = "Načítám...";
+                status.classList.remove('hidden');
+                img.src = targetUrl;
+                img.onload = () => {
+                    status.classList.add('hidden');
+                    img.classList.remove('hidden');
+                };
+            } else {
+                img.classList.add('hidden');
+                status.innerText = "Obrázek pro vybraný režim není v Google Tabulce zadaný.";
+                status.classList.remove('hidden');
+            }
+        }
+
+        async function openContactsModal() {
+            const list = document.getElementById('contacts-list');
+            const adminBox = document.getElementById('admin-add-contact-box');
+            list.innerHTML = '<span class="text-slate-400 font-bold block text-center py-4 text-sm animate-pulse">Načítám...</span>';
+
+            if (currentUser && currentUser.role === 'admin') {
+                adminBox.classList.remove('hidden');
+            } else {
+                adminBox.classList.add('hidden');
+            }
+
+            document.getElementById('contacts-modal').style.display = 'flex';
+
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_contacts' })
+                });
+                const res = await response.json();
+                if (res.success && res.contacts) {
+                    list.innerHTML = '';
+                    res.contacts.forEach(c => {
+                        const row = document.createElement('div');
+                        row.className = 'flex justify-between items-center p-2.5 bg-slate-100 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700';
+                        row.innerHTML = `
+                            <span class="font-extrabold text-xs text-slate-800 dark:text-slate-200">${c.name}</span>
+                            <a href="tel:${c.phone}" class="font-black text-blue-600 dark:text-blue-400 hover:underline text-sm tracking-wide bg-blue-50 dark:bg-blue-950/50 px-2 py-1 rounded border border-blue-200 dark:border-blue-800">${c.phone}</a>
+                        `;
+                        list.appendChild(row);
+                    });
+                } else {
+                    list.innerHTML = '<span class="text-slate-400 font-bold block text-center py-2">Žádné kontakty nenalezeny.</span>';
+                }
+            } catch (e) {
+                list.innerHTML = '<span class="text-red-500 font-bold block text-center py-2">Chyba načítání kontaktů.</span>';
+            }
+        }
+
+        async function submitNewContact() {
+            const name = document.getElementById('new-contact-name').value.trim();
+            const phone = document.getElementById('new-contact-phone').value.trim();
+
+            if (!name || !phone) return alert("Vyplňte název i telefon.");
+
+            await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'add_contact', name: name, phone: phone })
+            });
+
+            document.getElementById('new-contact-name').value = '';
+            document.getElementById('new-contact-phone').value = '';
+            openContactsModal();
+        }
+
+        async function openRequestModal() {
+            const adminBox = document.getElementById('admin-requests-box');
+            document.getElementById('request-modal').style.display = 'flex';
+
+            if (currentUser && currentUser.role === 'admin') {
+                adminBox.classList.remove('hidden');
+                loadAdminRequests();
+            } else {
+                adminBox.classList.add('hidden');
+            }
+        }
+
+        async function submitUserRequest() {
+            const text = document.getElementById('req-text-input').value.trim();
+            if (!text) return alert("Napište text požadavku.");
+
+            await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'add_request', text: text, author: currentUser.name })
+            });
+
+            document.getElementById('req-text-input').value = '';
+            alert("Požadavek byl úspěšně odeslán správci.");
+            closeModal('request-modal');
+        }
+
+        async function loadAdminRequests() {
+            const list = document.getElementById('admin-requests-list');
+            list.innerHTML = 'Načítám žádosti...';
+
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'get_requests' })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                list.innerHTML = '';
+                data.requests.forEach(r => {
+                    const box = document.createElement('div');
+                    box.className = 'p-2 bg-slate-100 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 space-y-1';
+                    box.innerHTML = `
+                        <div class="flex justify-between font-bold text-[10px] text-slate-400">
+                            <span>${r.author} (${r.time})</span>
+                            <span class="${r.status === 'Vyřešeno' ? 'text-emerald-500' : 'text-amber-500'} font-black">${r.status}</span>
+                        </div>
+                        <div class="font-bold text-xs">${r.text}</div>
+                        ${r.status !== 'Vyřešeno' ? `<button onclick="resolveRequest(${r.row})" class="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mt-1">Označit jako Vyřešeno</button>` : ''}
+                    `;
+                    list.appendChild(box);
+                });
+            }
+        }
+
+        async function resolveRequest(rowIdx) {
+            await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'resolve_request', row: rowIdx })
+            });
+            loadAdminRequests();
+        }
+
+        async function loadAdminUsers() {
+            const list = document.getElementById('admin-users-list');
+            list.innerHTML = 'Načítám uživatele...';
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'get_users' })
+                });
+                const res = await response.json();
+                if (res.success && res.users) {
+                    list.innerHTML = '';
+                    res.users.forEach(u => {
+                        const row = document.createElement('div');
+                        row.className = 'p-2 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2';
+                        row.innerHTML = `
+                            <div>
+                                <div class="font-black">${u.name}</div>
+                                <div class="text-[10px] text-slate-400">${u.email} (${u.role})</div>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="adminResetPass('${u.email}')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2 py-1 rounded text-[10px]">Reset hesla</button>
+                                <button onclick="adminToggleRole('${u.email}', '${u.role}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1 rounded text-[10px]">Role</button>
+                            </div>
+                        `;
+                        list.appendChild(row);
+                    });
+                }
+            } catch(e) {
+                list.innerHTML = 'Chyba načítání uživatelů.';
+            }
+        }
+
+        async function adminResetPass(email) {
+            if (!confirm(`Opravdu resetovat heslo pro ${email}?`)) return;
+            const newPass = prompt("Zadejte nové dočasné heslo:");
+            if (!newPass) return;
+            const newHash = await sha256(newPass);
+            const res = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'admin_reset_pass', email: email, newHash: newHash })
+            });
+            const data = await res.json();
+            alert(data.message || 'Hotovo');
+        }
+
+        async function adminToggleRole(email, currentRole) {
+            const newRole = currentRole === 'admin' ? 'dispecer' : 'admin';
+            if (!confirm(`Změnit roli pro ${email} na ${newRole}?`)) return;
+            const res = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'admin_set_role', email: email, role: newRole })
+            });
+            const data = await res.json();
+            alert(data.message || 'Hotovo');
+            loadAdminUsers();
+        }
+
+        function openBellModal(idx) {
+            activeBellIndex = idx;
+            const f = flights[idx];
+            document.getElementById('bell-modal-title').innerText = `Hlídání a zprávy (${f.callsign})`;
+            
+            if (f.alarm) {
+                document.getElementById('bell-type-select').value = f.alarm.type;
+                document.getElementById('bell-time-input').value = f.alarm.time || '';
+                document.getElementById('bell-msg-input').value = f.alarm.msg || '';
+            } else {
+                document.getElementById('bell-type-select').value = 'return';
+                document.getElementById('bell-time-input').value = '';
+                document.getElementById('bell-msg-input').value = '';
+            }
+            onBellTypeChange();
+            document.getElementById('bell-modal').style.display = 'flex';
+        }
+
+        function onBellTypeChange() {
+            const type = document.getElementById('bell-type-select').value;
+            const box = document.getElementById('bell-time-box');
+            if (type === 'landing') {
+                box.classList.add('hidden');
+            } else {
+                box.classList.remove('hidden');
+            }
+        }
+
+        function addMinutesToBell(mins) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + mins);
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            document.getElementById('bell-time-input').value = `${h}:${m}`;
+        }
+
+        function saveBellAlarm() {
+            if (activeBellIndex !== null) {
+                const type = document.getElementById('bell-type-select').value;
+                let rawTime = document.getElementById('bell-time-input').value.trim().replace(':', '');
+                const msg = document.getElementById('bell-msg-input').value.trim();
+
+                let timeFormatted = '';
+                if (type !== 'landing') {
+                    if (rawTime.length === 4 && !isNaN(rawTime)) {
+                        timeFormatted = `${rawTime.substr(0,2)}:${rawTime.substr(2,2)}`;
+                    } else if (rawTime.includes(':')) {
+                        timeFormatted = rawTime;
+                    }
+                }
+
+                flights[activeBellIndex].alarm = {
+                    type: type,
+                    time: timeFormatted,
+                    msg: msg,
+                    triggered: false
+                };
+
+                closeModal('bell-modal');
+                renderStrips();
+            }
+        }
+
+        function removeBellAlarm() {
+            if (activeBellIndex !== null) {
+                delete flights[activeBellIndex].alarm;
+                closeModal('bell-modal');
+                renderStrips();
+            }
+        }
+
+        function toggleRadio(idx) {
+            const f = flights[idx];
+            const hasTakeoff = f.vzlet && f.vzlet !== '--:--' && f.vzlet !== '-';
+            const hasLanding = f.pristani && f.pristani !== '--:--' && f.pristani !== '-';
+            const countVal = parseFloat(f.pristaniCount) || 0;
+
+            const requiredLandings = (hasTakeoff && hasLanding) ? 1 : 0.5;
+
+            if (f.radio && (hasTakeoff || hasLanding) && countVal < requiredLandings && !f.needsLandingInput) {
+                f.needsLandingInput = true;
+                renderStrips();
+                return;
+            }
+
+            f.needsLandingInput = false;
+            f.radio = !f.radio;
+            if (f.radio) f.isFinished = false;
+            renderStrips();
+        }
+
+        function confirmLandingAndFinish(idx) {
+            const f = flights[idx];
+            const countVal = parseFloat(f.pristaniCount) || 0;
+            const hasTakeoff = f.vzlet && f.vzlet !== '--:--' && f.vzlet !== '-';
+            const hasLanding = f.pristani && f.pristani !== '--:--' && f.pristani !== '-';
+            const requiredLandings = (hasTakeoff && hasLanding) ? 1 : 0.5;
+
+            if (countVal < requiredLandings) {
+                if (!confirm(`Počet přistání je ${countVal} (vyžadováno min. ${requiredLandings}). Opravdu chcete let ukončit?`)) {
+                    return;
+                }
+            }
+            f.needsLandingInput = false;
+            f.radio = false;
+            f.isFinished = true;
+            renderStrips();
+        }
+
+        function forceFinishFlight(idx) {
+            const f = flights[idx];
+            const hasTakeoff = f.vzlet && f.vzlet !== '--:--' && f.vzlet !== '-';
+            const hasLanding = f.pristani && f.pristani !== '--:--' && f.pristani !== '-';
+            const countVal = parseFloat(f.pristaniCount) || 0;
+            const requiredLandings = (hasTakeoff && hasLanding) ? 1 : 0.5;
+
+            if ((hasTakeoff || hasLanding) && countVal < requiredLandings && !f.needsLandingInput) {
+                f.needsLandingInput = true;
+                renderStrips();
+                return;
+            }
+
+            if (!f.vzlet || f.vzlet === '--:--') f.vzlet = '-';
+            if (!f.pristani || f.pristani === '--:--') f.pristani = '-';
+            if (!f.pic) f.pic = '-';
+            f.needsLandingInput = false;
+            f.radio = false;
+            f.isFinished = true;
+            renderStrips();
+        }
+
+        function toggleShowFinished() {
+            showFinished = !showFinished;
+            const btn = document.getElementById('toggle-finished-btn');
+            if (showFinished) {
+                btn.innerText = "SKRÝT UKONČENÉ LETY";
+                btn.classList.add('bg-blue-600', 'text-white');
+                btn.classList.remove('bg-slate-100');
+            } else {
+                btn.innerText = "ZOBRAZIT UKONČENÉ LETY";
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-slate-100');
+            }
+            renderStrips();
+        }
+
+        function toggleEdit(idx) {
+            flights[idx].isEditing = !flights[idx].isEditing;
+            renderStrips();
+            if (flights[idx].isEditing) {
+                setTimeout(() => {
+                    const csInp = document.getElementById(`cs-${idx}`);
+                    if (csInp) {
+                        csInp.focus();
+                        csInp.setSelectionRange(3, 3);
+                    }
+                }, 50);
+            }
+        }
+
+        function saveEdit(idx) {
+            const csInp = document.getElementById(`cs-${idx}`);
+            const typeInp = document.getElementById(`type-${idx}`);
+            const picInp = document.getElementById(`pic-${idx}`);
+            const pobInp = document.getElementById(`pob-${idx}`);
+            const remarkInp = document.getElementById(`remark-${idx}`);
+
+            if (csInp) flights[idx].callsign = csInp.value.toUpperCase();
+            if (typeInp) flights[idx].type = typeInp.value.toUpperCase();
+            if (picInp) flights[idx].pic = picInp.value.toUpperCase();
+            if (pobInp) flights[idx].pob = pobInp.value;
+            if (remarkInp) flights[idx].remark = remarkInp.value;
+
+            flights[idx].isEditing = false;
+            renderStrips();
+        }
+
+        function changeLanding(idx, delta) {
+            let val = parseFloat(flights[idx].pristaniCount) || 0;
+            flights[idx].pristaniCount = Math.max(0, val + delta);
+            renderStrips();
+        }
+
+        function deleteFlight(idx) {
+            flights.splice(idx, 1);
+            renderStrips();
+        }
+
+        function setNowTime(idx, field) {
+            const now = new Date();
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            flights[idx][field] = `${h}:${m}`;
+
+            if (field === 'pristani' && flights[idx].alarm && flights[idx].alarm.type === 'landing') {
+                triggerAlertBanner(`🛬 ZPRÁVA PO PŘISTÁNÍ [${flights[idx].callsign}]: ${flights[idx].alarm.msg || 'Letadlo právě přistálo.'}`);
+                flights[idx].alarm.triggered = true;
+            }
+
+            renderStrips();
+        }
+
+        function openTimeModal(idx, field) {
+            activeTimeTarget = { idx, field };
+            document.getElementById('time-modal-title').innerText = `Úprava času (${field.toUpperCase()})`;
+            document.getElementById('time-input').value = flights[idx][field] === '--:--' ? '' : flights[idx][field];
+            document.getElementById('time-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('time-input').focus(), 50);
+        }
+
+        function saveTimeModal() {
+            if (activeTimeTarget.idx !== null && activeTimeTarget.field) {
+                let val = document.getElementById('time-input').value.trim().replace(':', '');
+                if (val.length === 4 && !isNaN(val)) {
+                    val = `${val.substr(0,2)}:${val.substr(2,2)}`;
+                } else if (val === '') {
+                    val = '--:--';
+                }
+                flights[activeTimeTarget.idx][activeTimeTarget.field] = val;
+
+                if (activeTimeTarget.field === 'pristani' && flights[activeTimeTarget.idx].alarm && flights[activeTimeTarget.idx].alarm.type === 'landing') {
+                    triggerAlertBanner(`🛬 ZPRÁVA PO PŘISTÁNÍ [${flights[activeTimeTarget.idx].callsign}]: ${flights[activeTimeTarget.idx].alarm.msg || 'Letadlo právě přistálo.'}`);
+                    flights[activeTimeTarget.idx].alarm.triggered = true;
+                }
+
+                closeModal('time-modal');
+                renderStrips();
+            }
+        }
+
+        function addNewFlight() {
+            const newObj = {
+                id: Date.now(),
+                isEditing: true,
+                radio: true,
+                callsign: 'OK-',
+                type: '',
+                vzlet: '',
+                pristani: '',
+                pic: '',
+                pob: '',
+                pristaniCount: 0,
+                remark: '',
+                isFinished: false,
+                needsLandingInput: false
+            };
+            flights.unshift(newObj);
+            renderStrips();
+
+            setTimeout(() => {
+                const csInp = document.getElementById('cs-0');
+                if (csInp) {
+                    csInp.focus();
+                    csInp.setSelectionRange(3, 3);
+                }
+            }, 50);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                addNewFlight();
+            }
+        });
+
+        function setFont(fontKey) {
+            document.body.classList.remove('font-inter', 'font-roboto');
+            if (fontKey === 'inter') document.body.classList.add('font-inter');
+            if (fontKey === 'roboto') document.body.classList.add('font-roboto');
+        }
+
+        function openSettingsModal() { 
+            const adminSec = document.getElementById('admin-users-section');
+            if (currentUser && currentUser.role === 'admin') {
+                adminSec.classList.remove('hidden');
+                loadAdminUsers();
+            } else {
+                adminSec.classList.add('hidden');
+            }
+            document.getElementById('settings-modal').style.display = 'flex'; 
+        }
+        
+        function formatCallsignForExport(cs) {
+            if (!cs) return '';
+            let match = cs.match(/^(OK-[A-Z]{3})\s+(\d+)$/);
+            if (match) {
+                return `${match[1]}-${match[2]}`;
+            }
+            return cs;
+        }
+
+        function openExportModal() {
+            const d = new Date();
+            const todayStr = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getFullYear()).substr(2,2)}`;
+            let exportLines = [];
+            
+            flights.forEach(f => {
+                const hasTakeoff = f.vzlet && f.vzlet !== '--:--' && f.vzlet !== '-';
+                const hasLanding = f.pristani && f.pristani !== '--:--' && f.pristani !== '-';
+                
+                if (hasTakeoff || hasLanding) {
+                    exportLines.push([
+                        todayStr, formatCallsignForExport(f.callsign) || '', f.type || '', f.vzlet || '-', f.pristani || '-', f.pic || '-', f.pob || '-', f.pristaniCount || '0'
+                    ].join('\t'));
+                }
+            });
+            
+            document.getElementById('export-area').value = exportLines.join('\n');
+            document.getElementById('export-modal').style.display = 'flex';
+        }
+
+        function copyExportText() {
+            const area = document.getElementById('export-area');
+            area.select();
+            document.execCommand('copy');
+            alert("Všechny platné lety byly zkopírovány!");
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function confirmClearLog() {
+            if (confirm("Opravdu chcete vyčistit celý provozní deník?")) {
+                flights = [];
+                renderStrips();
+            }
+        }
+
+        renderStrips();
+    </script>
+</body>
+</html>
