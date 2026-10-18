@@ -402,7 +402,7 @@
                 <button onclick="openContactsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all">
                     KONTAKTY
                 </button>
-                <button onclick="openDataModal()" class="bg-violet-600 hover:bg-violet-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow-md">
+                <button onclick="openDataModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow-md">
                     DATA
                 </button>
                 <button onclick="openRequestModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow-md">
@@ -443,15 +443,15 @@
     <div id="data-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="flat-card max-w-md w-full p-5 space-y-4">
             <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
-                <h3 class="font-extrabold text-base text-violet-600">Záloha a obnova dat</h3>
+                <h3 class="font-extrabold text-base text-amber-600">Záloha a obnova dat</h3>
                 <button onclick="closeModal('data-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
             </div>
             <div class="space-y-3 text-xs">
                 <div class="bg-slate-100 dark:bg-slate-900 p-3 rounded border border-slate-200 dark:border-slate-700 font-medium leading-relaxed">
-                    Aplikace automaticky zálohuje rozepsaná data na pozadí každých 15 minut pro tvůj e-mail na aktuální den. V případě výpadku nebo zavření okna můžeš data ručně uložit nebo obnovit.
+                    Aplikace inteligentně zálohuje rozepsaná data na pozadí každých 15 minut (pouze pokud se na ploše cokoliv změnilo). Zde můžeš provést ruční uložení nebo obnovu.
                 </div>
                 <div class="space-y-2 pt-1">
-                    <button onclick="manualSaveBackup()" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-black py-2 rounded text-xs shadow transition-all">
+                    <button onclick="manualSaveBackup()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-2 rounded text-xs shadow transition-all">
                         ULOŽIT AKTUÁLNÍ STAV (ZÁLOHA)
                     </button>
                     <button onclick="manualLoadBackup()" class="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 font-black py-2 rounded text-xs transition-all">
@@ -771,7 +771,7 @@
 
     <!-- JAVASCRIPT LOGIKA -->
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzGiopIdMHM4MRetDnp3uj_T3c64KjfwMVBAp59AZ9hs-uAcR3vmW-3aaYcXYiECpJg/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxUFnGYljnq_UjmlE2309JYGK6aV3X-8iPHrMwZnWf3s9XDSO4jkPWPJNjnHmbXwfc3/exec";
 
         let showFinished = false;
         let activeTimeTarget = { idx: null, field: null };
@@ -780,6 +780,7 @@
         let aircraftDatabase = {};
         let cachedNavestniData = null;
         let autoSaveInterval = null;
+        let lastPayloadString = "";
 
         let flights = [];
         let gliderFlights = [];
@@ -852,6 +853,9 @@
                     document.getElementById('logged-user-name').innerText = `${resData.user.name} (${resData.user.role.toUpperCase()})`;
                     loadAircraftDatabase();
                     fetchRegQnhFromSheets();
+                    
+                    // Inicializace stavu pro inteligentní zálohování
+                    lastPayloadString = JSON.stringify(getPayloadData());
                     startAutoSaveTimer();
                 } else {
                     errEl.innerText = resData.message || "Chybné přihlašovací údaje.";
@@ -907,6 +911,7 @@
                         document.getElementById('logged-user-name').innerText = `${resData.user.name} (${resData.user.role.toUpperCase()})`;
                         loadAircraftDatabase();
                         fetchRegQnhFromSheets();
+                        lastPayloadString = JSON.stringify(getPayloadData());
                         startAutoSaveTimer();
                     } else {
                         errEl.innerText = resData.message || "Chyba při ukládání.";
@@ -1004,7 +1009,7 @@
             }
         }
 
-        // Funkce pro zálohování a obnovu dat
+        // Sestavení dat pro zálohu
         function getPayloadData() {
             return {
                 flights: flights,
@@ -1019,21 +1024,24 @@
             };
         }
 
+        // Ruční uložení zálohy
         async function manualSaveBackup() {
             if (!currentUser) return;
             const msgEl = document.getElementById('backup-status-msg');
             msgEl.innerText = "Ukládám...";
             try {
+                const currentPayload = getPayloadData();
                 const response = await fetch(GAS_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'save_backup',
                         email: currentUser.email,
-                        payload: getPayloadData()
+                        payload: currentPayload
                     })
                 });
                 const res = await response.json();
                 if (res.success) {
+                    lastPayloadString = JSON.stringify(currentPayload);
                     msgEl.innerText = "Záloha byla úspěšně uložena!";
                 } else {
                     msgEl.innerText = res.message || "Chyba při ukládání.";
@@ -1044,6 +1052,7 @@
             setTimeout(() => { msgEl.innerText = ""; }, 4000);
         }
 
+        // Načtení zálohy
         async function manualLoadBackup() {
             if (!currentUser) return;
             const msgEl = document.getElementById('backup-status-msg');
@@ -1081,6 +1090,7 @@
                     if (data.qnhVal) document.getElementById('qnh-val').innerText = data.qnhVal;
 
                     renderStrips();
+                    lastPayloadString = JSON.stringify(getPayloadData());
                     msgEl.innerText = "Záloha byla úspěšně obnovena!";
                     setTimeout(() => { closeModal('data-modal'); msgEl.innerText = ""; }, 1500);
                 } else {
@@ -1091,19 +1101,32 @@
             }
         }
 
+        // Inteligentní auto-save (každých 15 minut ukládá pouze při změně dat)
         function startAutoSaveTimer() {
             if (autoSaveInterval) clearInterval(autoSaveInterval);
             autoSaveInterval = setInterval(async () => {
                 if (!currentUser) return;
                 try {
-                    await fetch(GAS_URL, {
+                    const currentPayload = getPayloadData();
+                    const currentPayloadString = JSON.stringify(currentPayload);
+
+                    // Pokud se od poslední zálohy nic nezměnilo, nezatěžujeme server
+                    if (currentPayloadString === lastPayloadString) {
+                        return;
+                    }
+
+                    const response = await fetch(GAS_URL, {
                         method: 'POST',
                         body: JSON.stringify({
                             action: 'save_backup',
                             email: currentUser.email,
-                            payload: getPayloadData()
+                            payload: currentPayload
                         })
                     });
+                    const res = await response.json();
+                    if (res.success) {
+                        lastPayloadString = currentPayloadString;
+                    }
                 } catch (e) {}
             }, 15 * 60 * 1000); // 15 minut
         }
