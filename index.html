@@ -754,6 +754,7 @@
         let currentUser = null;
         let aircraftDatabase = {};
         let cachedNavestniData = null;
+        let alert1800TriggeredToday = false;
 
         let flights = [];
         let gliderFlights = [];
@@ -1105,6 +1106,12 @@
             const loc = now.toTimeString().substr(0, 5);
             document.getElementById('utc-clock').innerText = utc;
             document.getElementById('local-clock').innerText = loc;
+
+            // Kontrola 18:00 LOCAL TIME pro zobrazení upozornění
+            if (loc >= "18:00" && !alert1800TriggeredToday) {
+                alert1800TriggeredToday = true;
+                triggerAlertBanner("PO 1800 LOCAL ZÁKAZ MÍSTNÍ MOTOROVÉ ČINNOSTI (AEROVLEKY, OKRUHY...)");
+            }
 
             const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
             const dayName = days[now.getDay()];
@@ -1543,7 +1550,6 @@
             } else if (action === 'returns') {
                 activeGliderTab = 'returns';
                 const floatWin = document.getElementById('glider-floating-window');
-                // Reset pozice na výchozí vpravo dole a odstranění inline stylů přetáhnutí
                 floatWin.style.left = 'auto';
                 floatWin.style.top = 'auto';
                 floatWin.style.right = '1rem';
@@ -1685,7 +1691,6 @@
             let newLeft = initialLeft + dx;
             let newTop = initialTop + dy;
 
-            // Zajištění, že hlavička okna (záchytný bod) neuteče zcela mimo obrazovku
             const maxLeft = window.innerWidth - 60;
             const maxTop = window.innerHeight - 40;
 
