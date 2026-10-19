@@ -346,6 +346,9 @@
                         <div class="flex justify-between"><span>POHYBY:</span><span id="cnt-pohyby" class="text-blue-500 font-black">0</span></div>
                         <div class="flex justify-between"><span>NA FREKVENCI:</span><span id="cnt-radio" class="text-amber-500 font-black">0</span></div>
                         <div class="flex justify-between"><span>PŘISTÁNÍ CELKEM:</span><span id="cnt-landings" class="font-black">0</span></div>
+                        <div class="text-[10px] font-bold text-slate-400 pt-0.5 border-t border-slate-200 dark:border-slate-700 leading-tight">
+                            OPR HR: 15 APR - 15 OCT SAT, SUN, HOL 0700 - 1400 UTC
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-1 mt-1.5">
                         <button onclick="openExportModal()" class="btn-ui bg-slate-100 font-extrabold text-[10px] py-1 rounded text-center">
@@ -1462,6 +1465,22 @@
         function handleGliderKeyDown(e, field) {
             if (e.key === 'Enter') {
                 e.preventDefault();
+
+                // Pokud jsme na poli callsign a letadlo se úspěšně načteno z databáze (má typ/start), přeskočíme rovnou na první prázdné pole (pilot/poznámka)
+                if (field === 'callsign') {
+                    const typeVal = document.getElementById('g-type').value.trim();
+                    if (typeVal !== '') {
+                        // Zjistíme, které pole je první prázdné (start nebo remark)
+                        const startVal = document.getElementById('g-start').value.trim();
+                        if (!startVal) {
+                            document.getElementById('g-start').focus();
+                        } else {
+                            document.getElementById('g-remark').focus();
+                        }
+                        return;
+                    }
+                }
+
                 const sequence = ['callsign', 'type', 'start', 'remark'];
                 const mapIds = { 'callsign': 'g-callsign', 'type': 'g-type', 'start': 'g-start', 'remark': 'g-remark' };
                 const currentPos = sequence.indexOf(field);
@@ -2273,6 +2292,18 @@
         function confirmClearLog() {
             if (confirm("Opravdu chcete vyčistit celý provozní deník?")) {
                 flights = [];
+                gliderFlights = [];
+                gliderHistory = [];
+                
+                document.getElementById('top-note').value = '';
+                document.getElementById('top-note').classList.remove('has-note');
+                document.getElementById('daily-note').value = '';
+                document.getElementById('daily-note').classList.remove('has-note');
+                
+                document.getElementById('rwy-val').innerText = '- -';
+                document.getElementById('okruhy-val').innerText = '- -';
+                document.getElementById('qnh-val').innerText = '- -';
+
                 renderStrips();
                 localStorage.removeItem('lkhb_radio_state');
             }
