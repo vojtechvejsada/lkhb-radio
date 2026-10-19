@@ -308,7 +308,7 @@
                     <!-- POZNÁMKA PROVOZNÍ -->
                     <div class="space-y-0.5">
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">POZNÁMKA</span>
-                        <textarea id="top-note" oninput="autoResizeTextarea(this); checkNoteState(this);" placeholder="Provozní upozornění..." class="auto-textarea w-full px-2 py-1 text-xs font-bold rounded border border-slate-300 transition-all" rows="1"></textarea>
+                        <textarea id="top-note" oninput="autoResizeTextarea(this); checkNoteState(this); saveToLocalStorage();" placeholder="Provozní upozornění..." class="auto-textarea w-full px-2 py-1 text-xs font-bold rounded border border-slate-300 transition-all" rows="1"></textarea>
                     </div>
 
                     <!-- TEXTOVÝ PRUH OBLASTNÍ QNH -->
@@ -375,7 +375,7 @@
                 </button>
 
                 <!-- SPODNÍ POZNÁMKA DNE -->
-                <input type="text" id="daily-note" oninput="checkNoteState(this)" placeholder="Poznámka k provozu / dni..." class="px-2.5 py-1 text-xs w-52 rounded border border-slate-300 transition-all font-bold">
+                <input type="text" id="daily-note" oninput="checkNoteState(this); saveToLocalStorage();" placeholder="Poznámka k provozu / dni..." class="px-2.5 py-1 text-xs w-52 rounded border border-slate-300 transition-all font-bold">
 
                 <button id="toggle-finished-btn" onclick="toggleShowFinished()" class="btn-ui bg-slate-100 font-extrabold px-3 py-1.5 rounded text-xs">
                     ZOBRAZIT UKONČENÉ LETY
@@ -757,11 +757,56 @@
 
         // Varování před neuloženým zavřením stránky nebo F5
         window.addEventListener('beforeunload', function (e) {
-            if (currentUser && flights.length > 0) {
+            if (currentUser) {
                 e.preventDefault();
-                e.returnValue = '';
+                e.returnValue = 'Máte rozepsaná data. Opravdu chcete opustit stránku?';
+                return e.returnValue;
             }
         });
+
+        // ==================== LOKÁLNÍ UKLÁDÁNÍ (LOCALSTORAGE) ====================
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    flights: flights,
+                    gliderFlights: gliderFlights,
+                    gliderHistory: gliderHistory,
+                    topNote: document.getElementById('top-note').value,
+                    dailyNote: document.getElementById('daily-note').value,
+                    rwyVal: document.getElementById('rwy-val').innerText,
+                    okruhyVal: document.getElementById('okruhy-val').innerText,
+                    qnhVal: document.getElementById('qnh-val').innerText
+                };
+                localStorage.setItem('lkhb_radio_state', JSON.stringify(data));
+            } catch (e) {}
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('lkhb_radio_state');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    flights = data.flights || [];
+                    gliderFlights = data.gliderFlights || [];
+                    gliderHistory = data.gliderHistory || [];
+                    
+                    if (data.topNote) {
+                        const tn = document.getElementById('top-note');
+                        tn.value = data.topNote;
+                        autoResizeTextarea(tn);
+                        checkNoteState(tn);
+                    }
+                    if (data.dailyNote) {
+                        const dn = document.getElementById('daily-note');
+                        dn.value = data.dailyNote;
+                        checkNoteState(dn);
+                    }
+                    if (data.rwyVal) document.getElementById('rwy-val').innerText = data.rwyVal;
+                    if (data.okruhyVal) document.getElementById('okruhy-val').innerText = data.okruhyVal;
+                    if (data.qnhVal) document.getElementById('qnh-val').innerText = data.qnhVal;
+                }
+            } catch (e) {}
+        }
 
         async function sha256(str) {
             const buffer = new TextEncoder().encode(str);
@@ -819,6 +864,9 @@
                     document.getElementById('login-screen').classList.add('hidden');
                     document.getElementById('app-screen').classList.remove('hidden');
                     document.getElementById('logged-user-name').innerText = `${resData.user.name} (${resData.user.role.toUpperCase()})`;
+                    
+                    loadFromLocalStorage();
+                    renderStrips();
                     loadAircraftDatabase();
                     fetchRegQnhFromSheets();
                 } else {
@@ -873,6 +921,9 @@
                         document.getElementById('login-screen').classList.add('hidden');
                         document.getElementById('app-screen').classList.remove('hidden');
                         document.getElementById('logged-user-name').innerText = `${resData.user.name} (${resData.user.role.toUpperCase()})`;
+                        
+                        loadFromLocalStorage();
+                        renderStrips();
                         loadAircraftDatabase();
                         fetchRegQnhFromSheets();
                     } else {
@@ -990,6 +1041,7 @@
             document.getElementById('rwy-val').innerText = val || '- -';
             document.getElementById('okruhy-val').innerText = val === '11' ? 'PRAVÉ' : (val === '29' ? 'LEVÉ' : '- -');
             closeModal('rwy-modal');
+            saveToLocalStorage();
         }
 
         function openQnhModal() {
@@ -1004,6 +1056,7 @@
             btnNull.onclick = () => {
                 document.getElementById('qnh-val').innerText = '- -';
                 closeModal('qnh-modal');
+                saveToLocalStorage();
             };
             grid.appendChild(btnNull);
 
@@ -1021,6 +1074,7 @@
                 btn.onclick = () => {
                     document.getElementById('qnh-val').innerText = q;
                     closeModal('qnh-modal');
+                    saveToLocalStorage();
                 };
                 grid.appendChild(btn);
             }
@@ -1180,6 +1234,7 @@
                         const moved = flights.splice(draggedIndex, 1)[0];
                         flights.splice(idx, 0, moved);
                         renderStrips();
+                        saveToLocalStorage();
                     }
                 });
 
@@ -1291,7 +1346,7 @@
                         </div>
                         ${f.needsLandingInput ? `
                             <div class="mt-2 pt-2 border-t border-amber-300 bg-amber-50 dark:bg-amber-950/40 p-1.5 rounded flex items-center justify-between text-amber-800 dark:text-amber-300 font-black text-xs">
-                                <span>⚠️ LET NELZE UKONČIT: CHYBÍ VYPLNĚNÝ POČET PŘISTÁNÍ.</span>
+                                <span>⚠️ LET NELZE UKONČIT, CHYBÍ VYPLNĚNÝ POČET PŘISTÁNÍ.</span>
                                 <button onclick="confirmLandingAndFinish(${idx})" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded shadow">POTVRDIT ÚDAJE</button>
                             </div>
                         ` : ''}
@@ -1485,6 +1540,7 @@
             });
 
             renderGliderWindow();
+            saveToLocalStorage();
 
             document.getElementById('g-callsign').value = 'OK-';
             document.getElementById('g-type').value = '';
@@ -1510,6 +1566,7 @@
                     returnTime: returnTime
                 });
                 renderGliderWindow();
+                saveToLocalStorage();
             }
         }
 
@@ -1949,6 +2006,7 @@
 
                 closeModal('bell-modal');
                 renderStrips();
+                saveToLocalStorage();
             }
         }
 
@@ -1957,6 +2015,7 @@
                 delete flights[activeBellIndex].alarm;
                 closeModal('bell-modal');
                 renderStrips();
+                saveToLocalStorage();
             }
         }
 
@@ -1966,6 +2025,7 @@
             f.radio = !f.radio;
             if (f.radio) f.isFinished = false;
             renderStrips();
+            saveToLocalStorage();
         }
 
         function confirmLandingAndFinish(idx) {
@@ -1979,6 +2039,7 @@
             f.radio = false;
             f.isFinished = true;
             renderStrips();
+            saveToLocalStorage();
         }
 
         function forceFinishFlight(idx) {
@@ -1990,6 +2051,7 @@
             if ((hasTakeoff || hasLanding) && countVal < 0.5) {
                 f.needsLandingInput = true;
                 renderStrips();
+                saveToLocalStorage();
                 return;
             }
 
@@ -2000,6 +2062,7 @@
             f.radio = false;
             f.isFinished = true;
             renderStrips();
+            saveToLocalStorage();
         }
 
         function toggleShowFinished() {
@@ -2046,17 +2109,20 @@
 
             flights[idx].isEditing = false;
             renderStrips();
+            saveToLocalStorage();
         }
 
         function changeLanding(idx, delta) {
             let val = parseFloat(flights[idx].pristaniCount) || 0;
             flights[idx].pristaniCount = Math.max(0, val + delta);
             renderStrips();
+            saveToLocalStorage();
         }
 
         function deleteFlight(idx) {
             flights.splice(idx, 1);
             renderStrips();
+            saveToLocalStorage();
         }
 
         function setNowTime(idx, field) {
@@ -2076,6 +2142,7 @@
             }
 
             renderStrips();
+            saveToLocalStorage();
         }
 
         function openTimeModal(idx, field) {
@@ -2108,6 +2175,7 @@
 
                 closeModal('time-modal');
                 renderStrips();
+                saveToLocalStorage();
             }
         }
 
@@ -2129,6 +2197,7 @@
             };
             flights.unshift(newObj);
             renderStrips();
+            saveToLocalStorage();
 
             setTimeout(() => {
                 const csInp = document.getElementById('cs-0');
@@ -2200,10 +2269,12 @@
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
         function confirmClearLog() {
             if (confirm("Opravdu chcete vyčistit celý provozní deník?")) {
                 flights = [];
                 renderStrips();
+                localStorage.removeItem('lkhb_radio_state');
             }
         }
 
