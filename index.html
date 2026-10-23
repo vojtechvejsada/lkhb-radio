@@ -435,7 +435,7 @@
             <div class="flex items-center gap-2">
                 <button onclick="switchGliderTab('returns')" class="text-[10px] bg-teal-700 hover:bg-teal-800 px-2 py-0.5 rounded font-bold">Aktivní</button>
                 <button onclick="switchGliderTab('history')" class="text-[10px] bg-teal-700 hover:bg-teal-800 px-2 py-0.5 rounded font-bold">Historie</button>
-                <button onclick="closeGliderWindow()" class="text-white hover:text-slate-200 font-black text-sm ml-2">&times;</button>
+                <button onclick="closeGliderWindow()" class="bg-red-600 hover:bg-red-700 text-white font-black text-xs px-2 py-1 rounded ml-2 shadow">ZAVŘÍT</button>
             </div>
         </div>
         <div class="p-3 flex-1 overflow-y-auto space-y-2 text-xs" id="glider-window-content"></div>
@@ -598,8 +598,15 @@
     <div id="bell-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="flat-card max-w-sm w-full p-4 space-y-4">
             <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
-                <h3 class="font-extrabold text-sm" id="bell-modal-title">Hlídání a zprávy pro let</h3>
+                <div class="flex items-center gap-2">
+                    <h3 class="font-extrabold text-sm" id="bell-modal-title">Hlídání a zprávy pro let</h3>
+                </div>
                 <button onclick="closeModal('bell-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
+            </div>
+
+            <div class="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 p-2 rounded flex items-center justify-between text-xs font-bold text-blue-800 dark:text-blue-300">
+                <span>Aktuální UTC čas:</span>
+                <span id="bell-modal-utc" class="font-mono text-sm font-black">--:--</span>
             </div>
 
             <div class="space-y-3">
@@ -645,6 +652,10 @@
     <div id="time-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="flat-card max-w-xs w-full p-4 space-y-3">
             <h3 class="font-extrabold text-sm" id="time-modal-title">Úprava času</h3>
+            <div class="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 p-1.5 rounded flex items-center justify-between text-xs font-bold text-blue-800 dark:text-blue-300">
+                <span>Aktuální UTC:</span>
+                <span id="time-modal-utc" class="font-mono text-xs font-black">--:--</span>
+            </div>
             <input type="text" id="time-input" placeholder="HH:MM nebo HHMM" onkeydown="handleTimeModalKeyDown(event)" class="w-full p-2 bg-slate-100 border border-slate-300 rounded font-mono font-bold text-center text-base">
             <div class="flex justify-end gap-2 pt-1">
                 <button onclick="closeModal('time-modal')" class="bg-slate-200 dark:bg-slate-700 font-bold px-3 py-1 rounded text-xs">Zrušit</button>
@@ -716,7 +727,7 @@
                 <div class="text-slate-400">Tel: <a href="tel:+420601325949" class="text-blue-500 hover:underline">601 325 949</a></div>
                 <div class="text-slate-400">Email: <a href="mailto:vojta.vejsada@gmail.com" class="text-blue-500 hover:underline">vojta.vejsada@gmail.com</a></div>
                 <div class="text-[10px] text-slate-500 pt-2 font-bold">
-                    © 2026 Vojtěch Vejsada. Všechna práva vyhrazena.
+                    © 2026 Vojtěch Vejsada
                 </div>
             </div>
 
@@ -730,7 +741,7 @@
     <div id="export-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="flat-card max-w-2xl w-full p-5 space-y-4">
             <div class="flex justify-between items-center border-b pb-2 border-slate-200 dark:border-slate-700">
-                <h3 class="font-extrabold text-base">Export dat (A1:H pro Tabulky / Excel)</h3>
+                <h3 class="font-extrabold text-base">Export dat (pro Tabulky / Excel)</h3>
                 <button onclick="closeModal('export-modal')" class="text-slate-400 hover:text-slate-200 font-bold text-lg">&times;</button>
             </div>
             <textarea id="export-area" readonly class="w-full h-64 p-3 bg-slate-50 border border-slate-300 rounded text-xs font-mono select-all focus:outline-none"></textarea>
@@ -1107,6 +1118,20 @@
             document.getElementById('utc-clock').innerText = utc;
             document.getElementById('local-clock').innerText = loc;
 
+            // Aktualizace UTC času v otevřených modálních oknech (hlídání / čas)
+            const bellModalUtc = document.getElementById('bell-modal-utc');
+            if (bellModalUtc) bellModalUtc.innerText = `UTC ${utc}`;
+            const timeModalUtc = document.getElementById('time-modal-utc');
+            if (timeModalUtc) timeModalUtc.innerText = `UTC ${utc}`;
+
+            // Živá aktualizace doby letu u otevřených stripů
+            document.querySelectorAll('.duration-display').forEach(el => {
+                const idx = el.dataset.idx;
+                if (idx !== undefined && flights[idx]) {
+                    el.innerText = calculateDuration(flights[idx].vzlet, flights[idx].pristani);
+                }
+            });
+
             // Kontrola 18:00 LOCAL TIME pro zobrazení upozornění
             if (loc >= "18:00" && !alert1800TriggeredToday) {
                 alert1800TriggeredToday = true;
@@ -1148,7 +1173,7 @@
             const box = document.createElement('div');
             box.className = 'alert-banner bg-red-600 text-white font-black p-3.5 rounded-lg shadow-2xl border-2 border-white flex justify-between items-center text-sm pointer-events-auto';
             box.innerHTML = `
-                <span>${text}</span>
+                <span>UTC ${new Date().toISOString().substr(11, 5)} - ${text}</span>
                 <button onclick="dismissAlertBanner(this, ${flightId})" class="ml-4 bg-white/20 hover:bg-white/40 px-2.5 py-1 rounded text-xs font-bold">ROZUMÍM</button>
             `;
             container.appendChild(box);
@@ -1186,10 +1211,22 @@
         }
 
         function calculateDuration(vzlet, pristani) {
-            if (!vzlet || !pristani || vzlet === '--:--' || pristani === '--:--' || pristani === '-') return '--:--';
+            if (!vzlet || vzlet === '--:--' || vzlet === '-') return '--:--';
+            
             const [vH, vM] = vzlet.split(':').map(Number);
-            const [pH, pM] = pristani.split(':').map(Number);
-            if (isNaN(vH) || isNaN(vM) || isNaN(pH) || isNaN(pM)) return '--:--';
+            if (isNaN(vH) || isNaN(vM)) return '--:--';
+
+            let pH, pM;
+            if (!pristani || pristani === '--:--' || pristani === '-') {
+                const now = new Date();
+                pH = now.getUTCHours();
+                pM = now.getUTCMinutes();
+            } else {
+                const parts = pristani.split(':').map(Number);
+                pH = parts[0];
+                pM = parts[1];
+                if (isNaN(pH) || isNaN(pM)) return '--:--';
+            }
 
             let durationMinutes = (pH * 60 + pM) - (vH * 60 + vM);
             if (durationMinutes < 0) durationMinutes += 24 * 60;
@@ -1355,9 +1392,15 @@
                             </div>
 
                             <div class="col-span-12 md:col-span-3 flex items-center justify-end gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-slate-700">
+                                ${f.disconnectedTime ? `
+                                    <div class="text-center pr-1 border-r border-slate-200 dark:border-slate-700">
+                                        <span class="block text-[8px] font-extrabold text-slate-400 uppercase line-through">SPOJENÍ</span>
+                                        <span class="font-mono text-xs font-bold text-slate-500">${f.disconnectedTime}</span>
+                                    </div>
+                                ` : ''}
                                 <div class="text-center pr-2">
-                                    <span class="block text-[8px] font-extrabold text-slate-400 uppercase">ČAS LETU</span>
-                                    <span class="font-mono text-xs font-bold text-slate-400">
+                                    <span class="block text-[8px] font-extrabold text-slate-400 uppercase">DOBA LETU</span>
+                                    <span class="duration-display font-mono text-xs font-bold text-slate-400" data-idx="${idx}">
                                         ${calculateDuration(f.vzlet, f.pristani)}
                                     </span>
                                 </div>
@@ -1670,6 +1713,7 @@
         let isDragging = false, startX, startY, initialLeft, initialTop;
 
         dragHandle.addEventListener('mousedown', (e) => {
+            if (e.target.tagName === 'BUTTON') return;
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -1723,7 +1767,7 @@
             during: [
                 "ZAPISOVAT ZMĚNY A DŮLEŽITÁ SDĚLENÍ DO PROVOZNÍHO DENÍKU",
                 "V PŘÍPADĚ MIMOŘÁDNOSTI SE POSTUPUJE PODLE POHOTOVOSTNÍHO PLÁNU - K DISPOZICI V DOKUMENTACI DANÉHO STANOVIŠTĚ",
-                "ZAPISOVAT VZLETY A PŘISTÁNÍ CIZÍCH LETADEL (DENÍk EVIDENCE VZLETŮ A PŘISTÁNÍ)",
+                "ZAPISOVAT VZLETY A PŘISTÁNÍ CIZÍCH LETADEL (DENÍK EVIDENCE VZLETŮ A PŘISTÁNÍ)",
                 "PŘI PŘEBÍRÁNÍ/PŘEDÁVÁNÍ SLUŽBY ZAPSAT PŘEDÁNÍ SLUŽBY (JMÉNO, ČAS PŘEVZETÍ) DO PROVOZNÍHO DENÍKU"
             ],
             after: [
@@ -2078,7 +2122,15 @@
             const f = flights[idx];
             f.needsLandingInput = false;
             f.radio = !f.radio;
-            if (f.radio) f.isFinished = false;
+            if (f.radio) {
+                f.wasOnRadio = true;
+                f.isFinished = false;
+            } else {
+                if (f.wasOnRadio) {
+                    const now = new Date();
+                    f.disconnectedTime = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')}`;
+                }
+            }
             renderStrips();
             saveToLocalStorage();
         }
@@ -2239,6 +2291,8 @@
                 id: Date.now(),
                 isEditing: true,
                 radio: true,
+                wasOnRadio: true,
+                disconnectedTime: null,
                 callsign: 'OK-',
                 type: '',
                 vzlet: '',
