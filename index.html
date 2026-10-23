@@ -331,11 +331,24 @@
                     <div class="text-sm font-black text-slate-700 mt-0.5">
                         FIC PRAHA INFORMATION EAST 136,175
                     </div>
-                    <div class="text-xs font-extrabold text-slate-500 mt-1 leading-relaxed">
-                        ČÁSLAV TOWER 134,205 &nbsp;|&nbsp; ČÁSLAV RADAR 130,280<br>
-                        JIHLAVA RADIO 123,490 &nbsp;|&nbsp; CHOTĚBOŘ RADIO 120,110 &nbsp;|&nbsp; PŘIBYSLAV RADIO 125,610
+                    <div class="text-[11px] font-extrabold text-slate-500 mt-1 leading-snug space-y-0.5 w-full max-w-[340px] mx-auto">
+                        <div class="grid grid-cols-[1fr,auto,1fr] items-center gap-1">
+                            <div class="text-right pr-1">ČÁSLAV TOWER 134,205</div>
+                            <div class="text-slate-400 font-bold">|</div>
+                            <div class="text-left pl-1">ČÁSLAV RADAR 130,280</div>
+                        </div>
+                        <div class="grid grid-cols-[1fr,auto,1fr] items-center gap-1">
+                            <div class="text-right pr-1">JIHLAVA RADIO 123,490</div>
+                            <div class="text-slate-400 font-bold">|</div>
+                            <div class="text-left pl-1">CHOTĚBOŘ RADIO 120,110</div>
+                        </div>
+                        <div class="grid grid-cols-[1fr,auto,1fr] items-center gap-1">
+                            <div class="text-right pr-1">PŘIBYSLAV RADIO 125,610</div>
+                            <div class="text-slate-400 font-bold">|</div>
+                            <div class="text-left pl-1">KEJŽLICE RADIO 134,815</div>
+                        </div>
                     </div>
-                    <a href="https://aim.rlp.cz/vfrmanual/" target="_blank" class="text-xs font-bold text-blue-500 hover:underline mt-1.5">
+                    <a href="https://aim.rlp.cz/vfrmanual/" target="_blank" class="text-xs font-bold text-blue-500 hover:underline mt-1">
                         VFR příručka ŘLP
                     </a>
                 </div>
@@ -1299,6 +1312,8 @@
                     }
                 });
 
+                const hasTakeoffTime = f.vzlet && f.vzlet !== '--:--' && f.vzlet !== '-';
+
                 if (f.isEditing) {
                     card.innerHTML = `
                         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-1.5 mb-2">
@@ -1306,7 +1321,7 @@
                                 <span class="font-extrabold text-emerald-500">#${idx + 1}</span>
                                 <span class="font-black text-slate-900 dark:text-slate-100 text-base">${f.callsign || 'NOVÝ LET'}</span>
                             </div>
-                            <button onclick="deleteFlight(${idx})" class="text-red-500 font-bold text-xs hover:underline">Smazat let</button>
+                            <button onclick="deleteFlight(${idx})" class="p-1 text-slate-400 hover:text-red-500 text-xs font-bold">SMAZAT</button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-6 gap-2 items-end">
                             <div>
@@ -1399,13 +1414,15 @@
                                     </div>
                                 ` : ''}
                                 <div class="text-center pr-2">
-                                    <span class="block text-[8px] font-extrabold text-slate-400 uppercase">DOBA LETU</span>
-                                    <span class="duration-display font-mono text-xs font-bold text-slate-400" data-idx="${idx}">
-                                        ${calculateDuration(f.vzlet, f.pristani)}
-                                    </span>
+                                    ${hasTakeoffTime ? `
+                                        <span class="block text-[8px] font-extrabold text-slate-400 uppercase">DOBA LETU</span>
+                                        <span class="duration-display font-mono text-xs font-bold text-slate-400" data-idx="${idx}">
+                                            ${calculateDuration(f.vzlet, f.pristani)}
+                                        </span>
+                                    ` : ''}
                                 </div>
                                 <div class="flex items-center gap-1">
-                                    <button onclick="forceFinishFlight(${idx})" class="btn-ui bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold px-2 py-1 rounded text-[10px]" title="Ukončit">UKONČIT</button>
+                                    <button onclick="forceFinishFlight(${idx})" class="p-1 text-slate-400 hover:text-amber-500 text-xs font-bold">UKONČIT</button>
                                     <button onclick="toggleEdit(${idx})" class="p-1 text-slate-400 hover:text-blue-500 text-xs font-bold">UPRAVIT</button>
                                     <button onclick="deleteFlight(${idx})" class="p-1 text-slate-400 hover:text-red-500 text-xs font-bold">SMAZAT</button>
                                 </div>
