@@ -294,7 +294,7 @@
                         <!-- OKRUHY -->
                         <div class="tile-card cursor-default">
                             <span class="text-xs font-black text-slate-400 uppercase tracking-wider mb-0.5">OKRUHY</span>
-                            <span id="okruhy-val" class="text-sm param-value text-center font-black">- -</span>
+                            <span id="okruhy-val" class="text-xl param-value text-center font-black">- -</span>
                         </div>
 
                         <!-- QNH DLAŽDICE -->
@@ -1398,7 +1398,7 @@
                             </div>
 
                             <div class="col-span-6 md:col-span-2 text-center flex flex-col items-center">
-                                <span class="block text-[8px] font-extrabold text-slate-400 uppercase">PŘISTÁNÍ</span>
+                                <span class="block text-[8px] font-extrabold text-slate-400 uppercase">POČET PŘISTÁNÍ</span>
                                 <div class="inline-flex items-center border border-slate-300 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-900 p-0.5">
                                     <button onclick="changeLanding(${idx}, -0.5)" class="text-slate-400 font-bold px-1.5 text-xs">-</button>
                                     <span class="font-extrabold text-slate-900 dark:text-slate-100 w-5 text-center text-xs">${f.pristaniCount || 0}</span>
@@ -1407,7 +1407,7 @@
                             </div>
 
                             <div class="col-span-12 md:col-span-3 flex items-center justify-end gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-slate-700">
-                                ${f.disconnectedTime ? `
+                                ${!f.radio && f.disconnectedTime ? `
                                     <div class="text-center pr-1">
                                         <span class="block text-[8px] font-extrabold text-slate-400 uppercase">SPOJENÍ UKONČENO</span>
                                         <span class="font-mono text-xs font-bold text-slate-400">${f.disconnectedTime}</span>
@@ -2142,6 +2142,7 @@
             if (f.radio) {
                 f.wasOnRadio = true;
                 f.isFinished = false;
+                f.disconnectedTime = null; // Znovu zapnuto -> skryjeme čas ukončení spojení
             } else {
                 if (f.wasOnRadio) {
                     const now = new Date();
@@ -2244,9 +2245,11 @@
         }
 
         function deleteFlight(idx) {
-            flights.splice(idx, 1);
-            renderStrips();
-            saveToLocalStorage();
+            if (confirm("Opravdu si přejete let smazat?")) {
+                flights.splice(idx, 1);
+                renderStrips();
+                saveToLocalStorage();
+            }
         }
 
         function setNowTime(idx, field) {
