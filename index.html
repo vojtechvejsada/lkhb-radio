@@ -167,7 +167,7 @@
         .param-value {
             color: #0f172a;
             font-weight: 900;
-            font-size: 1.125rem;
+            font-size: 1.125rem; /* Jednotná velikost (text-lg / 18px) pro hodnoty v dlaždicích */
             line-height: 1.25rem;
         }
         body.dark .param-value { color: #f1f5f9; }
@@ -179,14 +179,6 @@
             50% { transform: translateY(-5px); }
         }
         .alert-banner { animation: alert-bounce 1s infinite; }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(-8px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-slide-in {
-            animation: slideInRight 0.2s ease-out forwards;
-        }
     </style>
 </head>
 <body class="p-3 md:p-4 text-xs">
@@ -801,6 +793,7 @@
         let gliderHistory = [];
         let activeGliderTab = 'returns';
 
+        // Varování před neuloženým zavřením stránky nebo F5
         window.addEventListener('beforeunload', function (e) {
             if (currentUser) {
                 e.preventDefault();
@@ -1146,11 +1139,13 @@
             document.getElementById('utc-clock').innerText = utc;
             document.getElementById('local-clock').innerText = loc;
 
+            // Aktualizace UTC času v otevřených modálních oknech (hlídání / čas)
             const bellModalUtc = document.getElementById('bell-modal-utc');
             if (bellModalUtc) bellModalUtc.innerText = `UTC ${utc}`;
             const timeModalUtc = document.getElementById('time-modal-utc');
             if (timeModalUtc) timeModalUtc.innerText = `UTC ${utc}`;
 
+            // Živá aktualizace doby letu u otevřených stripů
             document.querySelectorAll('.duration-display').forEach(el => {
                 const idx = el.dataset.idx;
                 if (idx !== undefined && flights[idx]) {
@@ -1158,6 +1153,7 @@
                 }
             });
 
+            // Kontrola 18:00 LOCAL TIME pro zobrazení upozornění
             if (loc >= "18:00" && !alert1800TriggeredToday) {
                 alert1800TriggeredToday = true;
                 triggerAlertBanner("PO 1800 LOCAL ZÁKAZ MÍSTNÍ MOTOROVÉ ČINNOSTI (AEROVLEKY, OKRUHY...)");
@@ -1327,51 +1323,40 @@
                 const hasTakeoffTime = f.vzlet && f.vzlet !== '--:--' && f.vzlet !== '-';
 
                 if (f.isEditing) {
-                    if (f.editStep === undefined) f.editStep = 1;
-
                     card.innerHTML = `
-                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-1 mb-2">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-1.5 mb-2">
                             <div class="flex items-center gap-2">
                                 <span class="font-extrabold text-emerald-500">#${idx + 1}</span>
-                                <span class="font-black text-slate-900 dark:text-slate-100 text-sm">ZADÁVÁNÍ LETU (krok ${f.editStep}/5)</span>
+                                <span class="font-black text-slate-900 dark:text-slate-100 text-base">${f.callsign || 'NOVÝ LET'}</span>
                             </div>
                             <button onclick="deleteFlight(${idx})" class="p-1 text-slate-400 hover:text-red-500 text-xs font-bold">SMAZAT</button>
                         </div>
-                        <div class="flex flex-wrap items-end gap-2 overflow-x-auto py-1">
-                            <div class="flex-shrink-0 w-32">
-                                <label class="block text-[8px] font-bold text-slate-400 uppercase mb-0.5">CALLSIGN</label>
-                                <input type="text" id="cs-${idx}" value="${f.callsign}" oninput="onCallsignInput(${idx})" onkeydown="handleKeyDown(event, ${idx}, 'cs')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-black uppercase text-slate-900 dark:text-slate-100 text-xs">
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-2 items-end">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">CALLSIGN</label>
+                                <input type="text" id="cs-${idx}" value="${f.callsign}" oninput="onCallsignInput(${idx})" onkeydown="handleKeyDown(event, ${idx}, 'cs')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-black uppercase text-slate-900 dark:text-slate-100">
                             </div>
-                            
-                            ${f.editStep >= 2 ? `
-                            <div class="flex-shrink-0 w-24 animate-slide-in">
-                                <label class="block text-[8px] font-bold text-slate-400 uppercase mb-0.5">TYP</label>
-                                <input type="text" id="type-${idx}" value="${f.type}" placeholder="C172" onkeydown="handleKeyDown(event, ${idx}, 'type')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium uppercase text-xs">
-                            </div>` : ''}
-
-                            ${f.editStep >= 3 ? `
-                            <div class="flex-shrink-0 w-28 animate-slide-in">
-                                <label class="block text-[8px] font-bold text-slate-400 uppercase mb-0.5">PIC</label>
-                                <input type="text" id="pic-${idx}" value="${f.pic}" placeholder="Jméno" onkeydown="handleKeyDown(event, ${idx}, 'pic')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium uppercase text-xs">
-                            </div>` : ''}
-
-                            ${f.editStep >= 4 ? `
-                            <div class="flex-shrink-0 w-20 animate-slide-in">
-                                <label class="block text-[8px] font-bold text-slate-400 uppercase mb-0.5">POB</label>
-                                <input type="text" id="pob-${idx}" list="pob-list" value="${f.pob}" placeholder="X, 1-4" onkeydown="handleKeyDown(event, ${idx}, 'pob')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium text-center text-xs">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">TYP</label>
+                                <input type="text" id="type-${idx}" value="${f.type}" placeholder="např. C172" onkeydown="handleKeyDown(event, ${idx}, 'type')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">PIC</label>
+                                <input type="text" id="pic-${idx}" value="${f.pic}" placeholder="Jméno" onkeydown="handleKeyDown(event, ${idx}, 'pic')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium uppercase">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">POB</label>
+                                <input type="text" id="pob-${idx}" list="pob-list" value="${f.pob}" placeholder="X, -, 1-4" onkeydown="handleKeyDown(event, ${idx}, 'pob')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium text-center">
                                 <datalist id="pob-list">
                                     <option value="X"><option value="-"><option value="1"><option value="2"><option value="3"><option value="4">
                                 </datalist>
-                            </div>` : ''}
-
-                            ${f.editStep >= 5 ? `
-                            <div class="flex-shrink-0 w-36 animate-slide-in">
-                                <label class="block text-[8px] font-bold text-slate-400 uppercase mb-0.5">POZNÁMKA</label>
-                                <input type="text" id="remark-${idx}" value="${f.remark}" placeholder="Trať..." onkeydown="handleKeyDown(event, ${idx}, 'remark')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium text-xs">
-                            </div>` : ''}
-
-                            <div class="flex-shrink-0">
-                                <button onclick="saveEdit(${idx})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded text-xs">Uložit</button>
+                            </div>
+                            <div class="md:col-span-2 flex items-center gap-2">
+                                <div class="flex-1">
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">POZNÁMKA</label>
+                                    <input type="text" id="remark-${idx}" value="${f.remark}" onkeydown="handleKeyDown(event, ${idx}, 'remark')" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded font-medium">
+                                </div>
+                                <button onclick="saveEdit(${idx})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded text-xs self-end">Uložit</button>
                             </div>
                         </div>
                     `;
@@ -1547,26 +1532,20 @@
         function handleKeyDown(e, idx, field) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                let f = flights[idx];
-                if (f.editStep === undefined) f.editStep = 1;
+                const typeInp = document.getElementById(`type-${idx}`);
+                
+                if (field === 'cs' && typeInp && typeInp.dataset.autofilled === "true") {
+                    const picInp = document.getElementById(`pic-${idx}`);
+                    if (picInp) picInp.focus();
+                    return;
+                }
 
-                if (field === 'cs') {
-                    f.editStep = Math.max(f.editStep, 2);
-                    renderStrips();
-                    setTimeout(() => document.getElementById(`type-${idx}`)?.focus(), 50);
-                } else if (field === 'type') {
-                    f.editStep = Math.max(f.editStep, 3);
-                    renderStrips();
-                    setTimeout(() => document.getElementById(`pic-${idx}`)?.focus(), 50);
-                } else if (field === 'pic') {
-                    f.editStep = Math.max(f.editStep, 4);
-                    renderStrips();
-                    setTimeout(() => document.getElementById(`pob-${idx}`)?.focus(), 50);
-                } else if (field === 'pob') {
-                    f.editStep = Math.max(f.editStep, 5);
-                    renderStrips();
-                    setTimeout(() => document.getElementById(`remark-${idx}`)?.focus(), 50);
-                } else if (field === 'remark') {
+                const sequence = ['cs', 'type', 'pic', 'pob', 'remark'];
+                const currentPos = sequence.indexOf(field);
+                if (currentPos !== -1 && currentPos < sequence.length - 1) {
+                    const nextEl = document.getElementById(`${sequence[currentPos + 1]}-${idx}`);
+                    if (nextEl) nextEl.focus();
+                } else {
                     saveEdit(idx);
                 }
             }
@@ -2236,9 +2215,6 @@
 
         function toggleEdit(idx) {
             flights[idx].isEditing = !flights[idx].isEditing;
-            if (flights[idx].isEditing) {
-                flights[idx].editStep = 5; // Při klasické úpravě existujícího letu otevřít rovnou vše
-            }
             renderStrips();
             if (flights[idx].isEditing) {
                 setTimeout(() => {
@@ -2342,7 +2318,6 @@
             const newObj = {
                 id: Date.now(),
                 isEditing: true,
-                editStep: 1, // Začíná pouze s volacím znakem
                 radio: true,
                 wasOnRadio: true,
                 disconnectedTime: null,
