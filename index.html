@@ -167,6 +167,8 @@
         .param-value {
             color: #0f172a;
             font-weight: 900;
+            font-size: 1.125rem; /* Jednotná velikost (text-lg / 18px) pro hodnoty v dlaždicích */
+            line-height: 1.25rem;
         }
         body.dark .param-value { color: #f1f5f9; }
 
@@ -288,19 +290,19 @@
                         <!-- RWY DLAŽDICE -->
                         <div class="tile-card" onclick="openRwyModal()">
                             <span class="text-xs font-black text-slate-400 uppercase tracking-wider mb-0.5">RWY</span>
-                            <span id="rwy-val" class="text-xl param-value font-black">- -</span>
+                            <span id="rwy-val" class="param-value font-black">- -</span>
                         </div>
 
                         <!-- OKRUHY -->
                         <div class="tile-card cursor-default">
                             <span class="text-xs font-black text-slate-400 uppercase tracking-wider mb-0.5">OKRUHY</span>
-                            <span id="okruhy-val" class="text-xl param-value text-center font-black">- -</span>
+                            <span id="okruhy-val" class="param-value text-center font-black">- -</span>
                         </div>
 
                         <!-- QNH DLAŽDICE -->
                         <div class="tile-card" onclick="openQnhModal()">
                             <span class="text-xs font-black text-slate-400 uppercase tracking-wider mb-0.5">QNH</span>
-                            <span id="qnh-val" class="text-xl param-value font-black">- -</span>
+                            <span id="qnh-val" class="param-value font-black">- -</span>
                         </div>
 
                     </div>
@@ -387,53 +389,59 @@
 
         <!-- SPODNÍ LIŠTA -->
         <div class="sticky bottom-0 left-0 right-0 z-40 flex flex-col md:flex-row items-center justify-between gap-2 flat-card p-2.5 shadow-lg border-t border-slate-300 backdrop-blur-md">
-            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                <button onclick="addNewFlight()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-3.5 py-1.5 rounded shadow-sm text-xs transition-all" title="Klávesová zkratka Alt+N">
-                    + NOVÝ LET (Alt+N)
-                </button>
-
-                <!-- SPODNÍ POZNÁMKA DNE -->
-                <input type="text" id="daily-note" oninput="checkNoteState(this); saveToLocalStorage();" placeholder="Poznámka k provozu / dni..." class="px-2.5 py-1 text-xs w-52 rounded border border-slate-300 transition-all font-bold">
-
-                <button id="toggle-finished-btn" onclick="toggleShowFinished()" class="btn-ui bg-slate-100 font-extrabold px-3 py-1.5 rounded text-xs">
-                    ZOBRAZIT UKONČENÉ LETY
-                </button>
-
-                <!-- VĚTRONĚ NA PŘELETU MENU -->
-                <div class="relative inline-block text-left">
-                    <button onclick="toggleGliderDropdown()" class="bg-teal-600 hover:bg-teal-700 text-white font-black px-3.5 py-1.5 rounded text-xs transition-all shadow-md flex items-center gap-1.5">
-                        VĚTRONĚ NA PŘELETU <span class="text-[10px]">▼</span>
+            <div class="flex items-center gap-2 w-full">
+                <!-- LEVÁ FIXNÍ SKUPINA (TLAČÍTKO NOVÝ LET) -->
+                <div class="flex-shrink-0">
+                    <button onclick="addNewFlight()" class="bg-blue-600 hover:bg-blue-700 text-white font-black px-3.5 py-1.5 rounded shadow-sm text-xs transition-all whitespace-nowrap" title="Klávesová zkratka Alt+N">
+                        + NOVÝ LET (Alt+N)
                     </button>
-                    <div id="glider-dropdown" class="hidden absolute bottom-full left-0 mb-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-50 overflow-hidden">
-                        <button onclick="openGliderModal('insert')" class="w-full text-left px-4 py-2 text-xs font-extrabold text-slate-700 dark:text-slate-200 hover:bg-teal-50 hover:text-teal-600 transition-colors">Vložit let</button>
-                        <button onclick="openGliderModal('returns')" class="w-full text-left px-4 py-2 text-xs font-extrabold text-slate-700 dark:text-slate-200 hover:bg-teal-50 hover:text-teal-600 transition-colors">Návraty</button>
-                    </div>
                 </div>
 
-                <!-- POMOCNÁ TLAČÍTKA -->
-                <button onclick="openChecklistModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all">
-                    CHECKLIST
-                </button>
-                <button onclick="openNavestniModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all">
-                    NÁVĚSTNÍ PLOCHA
-                </button>
-                <button onclick="openContactsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all">
-                    KONTAKTY
-                </button>
-                <button onclick="openRequestModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow-md">
-                    NAHLÁSIT
-                </button>
+                <!-- PRAVÁ ZABALITELNÁ SKUPINA OSTATNÍCH PRVKŮ -->
+                <div class="flex flex-wrap items-center gap-2 flex-1">
+                    <!-- SPODNÍ POZNÁMKA DNE -->
+                    <input type="text" id="daily-note" oninput="checkNoteState(this); saveToLocalStorage();" placeholder="Poznámka k provozu / dni..." class="px-2.5 py-1 text-xs w-52 rounded border border-slate-300 transition-all font-bold">
+
+                    <button id="toggle-finished-btn" onclick="toggleShowFinished()" class="btn-ui bg-slate-100 font-extrabold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                        ZOBRAZIT UKONČENÉ LETY
+                    </button>
+
+                    <!-- VĚTRONĚ NA PŘELETU MENU -->
+                    <div class="relative inline-block text-left">
+                        <button onclick="toggleGliderDropdown()" class="bg-teal-600 hover:bg-teal-700 text-white font-black px-3.5 py-1.5 rounded text-xs transition-all shadow-md flex items-center gap-1.5 whitespace-nowrap">
+                            VĚTRONĚ NA PŘELETU <span class="text-[10px]">▼</span>
+                        </button>
+                        <div id="glider-dropdown" class="hidden absolute bottom-full left-0 mb-1 w-44 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-50 overflow-hidden">
+                            <button onclick="openGliderModal('insert')" class="w-full text-left px-4 py-2 text-xs font-extrabold text-slate-700 dark:text-slate-200 hover:bg-teal-50 hover:text-teal-600 transition-colors">Vložit let</button>
+                            <button onclick="openGliderModal('returns')" class="w-full text-left px-4 py-2 text-xs font-extrabold text-slate-700 dark:text-slate-200 hover:bg-teal-50 hover:text-teal-600 transition-colors">Návraty</button>
+                        </div>
+                    </div>
+
+                    <!-- POMOCNÁ TLAČÍTKA -->
+                    <button onclick="openChecklistModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all whitespace-nowrap">
+                        CHECKLIST
+                    </button>
+                    <button onclick="openNavestniModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all whitespace-nowrap">
+                        NÁVĚSTNÍ PLOCHA
+                    </button>
+                    <button onclick="openContactsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded text-xs transition-all whitespace-nowrap">
+                        KONTAKTY
+                    </button>
+                    <button onclick="openRequestModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow-md whitespace-nowrap">
+                        NAHLÁSIT
+                    </button>
+                </div>
             </div>
 
-            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+            <div class="flex items-center gap-2 flex-shrink-0 justify-end">
                 <!-- VYHLEDÁVÁNÍ -->
                 <div class="flex items-center gap-2">
-                    <span class="font-bold text-slate-400 text-xs">VYHLEDAT:</span>
+                    <span class="font-bold text-slate-400 text-xs whitespace-nowrap">VYHLEDAT:</span>
                     <input type="text" id="search-input" oninput="renderStrips()" placeholder="Volací znak/PIC" class="px-2.5 py-1 text-xs w-44 rounded border border-slate-300">
                 </div>
 
                 <!-- TLAČÍTKO ODHLÁSIT -->
-                <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow">
+                <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white font-black px-3 py-1.5 rounded text-xs transition-all shadow whitespace-nowrap">
                     ODHLÁSIT
                 </button>
             </div>
@@ -2142,7 +2150,7 @@
             if (f.radio) {
                 f.wasOnRadio = true;
                 f.isFinished = false;
-                f.disconnectedTime = null; // Znovu zapnuto -> skryjeme čas ukončení spojení
+                f.disconnectedTime = null;
             } else {
                 if (f.wasOnRadio) {
                     const now = new Date();
